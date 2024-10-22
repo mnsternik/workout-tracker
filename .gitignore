@@ -1,0 +1,66 @@
+# Compiled object files
+*.o
+*.dll
+*.exe
+*.obj
+*.pdb
+*.cache
+*.log
+
+# Avoid tracking sensitive configuration
+appsettings.json
+appsettings.*.json
+
+# Build directories
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.vspscc
+*.vssscc
+.vscode/
+.vs/
+.idea/
+
+# ASP.NET directories
+project.lock.json
+project.fragment.lock.json
+artifacts/
+node_modules/
+wwwroot/lib/
+wwwroot/dist/
+wwwroot/node_modules/
+
+# Logs
+*.log
+logs/
+*.log
+*.nlog
+*.trace
+*.trx
+
+# Entity Framework migrations
+App_Data/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+
+
+# Sensitive files
+secrets.json
+
+# Generated files
+!*.cs
+!*.fs
+!*.json
+!*.resx
+!*.sln
+!*.csproj
+*.userprefs
+/appsettings.json

@@ -1,0 +1,202 @@
+﻿@model WorkoutTracker.Models.ViewModels.TrainingViewModel
+
+<form asp-action="SubmitTraining" method="post" class="d-flex flex-column gap-2">
+
+    <div class="form-group col-md-3">
+        <label class="form-label" asp-for="Name"></label>
+        <input class="form-control" asp-for="Name" />
+    </div>
+
+    <div class="form-group col-md-3">
+        <label class="form-label" asp-for="Date"></label>
+        <input class="form-control" asp-for="Date" type="date" />
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" asp-for="Description"></label>
+        <textarea class="form-control" asp-for="Description"></textarea>
+    </div>
+
+
+
+    <label class="form-label" asp-for="Exercises"></label>
+    <div id="exercises-container">
+        @for (int i = 0; i < Model.Exercises.Count; i++)
+        {
+            <div class="exercise" id="exercise-@i">
+                <h4>Exercise @i</h4>
+                <div class="form-group">
+                    <label class="form-label" asp-for="Exercises[i].Name"></label>
+                    <input class="form-control" asp-for="Exercises[i].Name" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" asp-for="Exercises[i].Description"></label>
+                    <textarea class="form-control" asp-for="Exercises[i].Description"></textarea>
+                </div>
+
+                <div id="sets-container-@i">
+                    @for (int j = 0; j < Model.Exercises[i].Sets.Count; j++)
+                    {
+                        <div class="form-group set" id="set-@i-@j">
+                            <label class="form-label" asp-for="Exercises[i].Sets[j].Repetitions"></label>
+                            <input class="form-control" asp-for="Exercises[i].Sets[j].Repetitions" />
+
+                            <label class="form-label" asp-for="Exercises[i].Sets[j].Weight"></label>
+                            <input class="form-control" asp-for="Exercises[i].Sets[j].Weight" />
+                        </div>
+                    }
+                </div>
+
+                <button type="button" class="btn btn-primary add-set-btn" data-exercise-id="@i">Add Set</button>
+            </div>
+        }
+    </div>
+
+    <div>
+        <button type="button" class="btn btn-primary" id="add-exercise-btn">Add Exercise</button>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </div>
+
+
+</form>
+
+@section Scripts {
+    <script>
+        let exerciseCount = @Model.Exercises.Count;
+        let setCounters = Array(exerciseCount).fill(0);
+
+        $('#add-exercise-btn').on('click', function () {
+            const newExerciseHtml = `
+                        <div class="accordion-item" id="exercise-${exerciseCount}>
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${exerciseCount}" aria-expanded="true" aria-controls="collapse-${exerciseCount}">
+                                    <p>Exercise ${exerciseCount}</p>
+                                </button>
+                            </h2>
+                            <div id="collapse-${exerciseCount}" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <div class="form-group">
+                                        <label class="form-label" for="Exercises_${exerciseCount}__Name">Name</label>
+                                        <input class="form-control" id="Exercises_${exerciseCount}__Name" name="Exercises[${exerciseCount}].Name" />
+                                    </div>
+
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Set</th>
+                                                <th scope="col">Repetitions</th>
+                                                <th scope="col">Weight</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="sets-container-${exerciseCount}">
+
+                                        </tbody>
+                                    </table>
+                                    <div class="form-group">
+                                        <button type="button" class="btn add-set-btn" data-exercise-id="${exerciseCount}">Add Set</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+            $('#exercises-container').append(newExerciseHtml);
+            setCounters.push(0);
+            exerciseCount++;
+        });
+
+        $(document).on('click', '.add-set-btn', function () {
+            const exerciseId = $(this).data('exercise-id');
+            const setCounter = setCounters[exerciseId];
+            const newSetHtml = `
+                    <tr class="set" id="set-${exerciseId}-${setCounter}">
+                        <th scope="col">${setCounter}</th>
+                        <th scope="col" class="form-group">
+                            <input class="form-control" id="Exercises_${exerciseId}__Sets_${setCounter}__Repetitions" name="Exercises[${exerciseId}].Sets[${setCounter}].Repetitions" />
+                        </th>
+                        <th scope="col" class="form-group">
+                            <input class="form-control" id="Exercises_${exerciseId}__Sets_${setCounter}__Weight" name="Exercises[${exerciseId}].Sets[${setCounter}].Weight" />
+                        </th>
+                    </tr>
+                    `;
+            $(`#sets-container-${exerciseId}`).append(newSetHtml);
+            setCounters[exerciseId]++;
+        });
+    </script>
+
+
+
+
+    @* @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        document.getElementById("add-exercise").addEventListener("click", function (event) {
+            let exerciseList = document.getElementById('exercise-list');
+            let exerciseCount = document.querySelectorAll('.exercise-list-item').length;
+
+            // Create new exercise form
+            let newExerciseItem = document.createElement('div');
+            newExerciseItem.classList.add('exercise-list-item');
+            newExerciseItem.id = `exercise-${exerciseCount}`
+            newExerciseItem.innerHTML = `
+                <div class="accordion-item" id="exercise-${exerciseCount}>
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                            aria-expanded="true" aria-controls="collapseOne">
+                                                <h4>Exercise ${exerciseCount}</h4>
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                        data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Set</th>
+                                        <th scope="col">Repetitions</th>
+                                        <th scope="col">Weight</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="set-list-${exerciseCount}">
+
+                                </tbody>
+
+                                <div class="form-group">
+                                    <button id="add-set-btn${exerciseCount}" class="btn btn-primary" type="button">Add Set</button>
+                                </div>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            exerciseList.appendChild(newExerciseItem);
+        });
+
+
+        document.getElementById("add-set").addEventListener("click", function (event) {
+
+            let setList = document.getElementById('set-list');
+            // let exerciseCount = document.querySelectorAll('.exercise-list-item').length;
+
+            let newSetItem = document.createElement('div');
+            newSetItem.classList.add('set-list-item');
+            newSetItem.innerHTML = `
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>25</td>
+                                <td>10</td>
+                            </tr>
+                        `;
+
+            setList.appendChild(newSetItem);
+        });
+
+    </script>
+ *@
+}
