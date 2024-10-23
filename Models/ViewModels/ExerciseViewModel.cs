@@ -10,9 +10,8 @@ namespace WorkoutTracker.Models.ViewModels
         [Required]
         public string Name { get; set; }
 
-        [StringLength(300, MinimumLength = 10)]
-        [Required]
-        public string Description { get; set; }
+        [StringLength(300)]
+        public string? Description { get; set; }
 
         public List<SetViewModel> Sets { get; set; } = new List<SetViewModel>();
     }

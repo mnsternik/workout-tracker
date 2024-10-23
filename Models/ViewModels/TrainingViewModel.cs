@@ -10,7 +10,7 @@ namespace WorkoutTracker.Models.ViewModels
         public string Name { get; set; }
 
         [StringLength(300, MinimumLength = 10)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [DataType(DataType.Date)]
         [Required]

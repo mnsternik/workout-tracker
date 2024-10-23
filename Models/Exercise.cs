@@ -10,8 +10,7 @@ namespace WorkoutTracker.Models
         [Required]
         public string Name { get; set; }
 
-        [StringLength(300, MinimumLength = 10)]
-        [Required]
-        public string Description { get; set; }
+        [StringLength(300)]
+        public string? Description { get; set; }
     }
 }
