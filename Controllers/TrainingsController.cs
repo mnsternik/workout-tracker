@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.DotNet.Scaffolding.Shared.Project;
 using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Data;
 using WorkoutTracker.Models;
@@ -50,20 +51,55 @@ namespace WorkoutTracker.Controllers
             return View(new TrainingViewModel());
         }
 
+        // Action to return the exercise partial view
+        public PartialViewResult RenderExercisePartial(int exerciseIndex)
+        {
+            return PartialView("_ExercisePartial", exerciseIndex);
+        }
+
+        // Action to return the set partial view
+        public PartialViewResult RenderSetPartial(int exerciseIndex, int setIndex)
+        {
+            return PartialView("_SetPartial", Tuple.Create(exerciseIndex, setIndex));
+        }
+
         // POST: Trainings/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date")] Training training)
+        public async Task<IActionResult> Create(TrainingViewModel model)
         {
             if (ModelState.IsValid)
             {
+
+                var training = new Training
+                {
+                    Name = model.Name,
+                    Description = model.Description,
+                    Date = model.Date,
+                    Exercises = new List<Exercise>{}
+                };
+
+                foreach (var exercise in model.Exercises)
+                {
+                    var strengthExercise = new StrengthExercise
+                    {
+                        Name = exercise.Name,
+                        Description = exercise.Description,
+                        Sets = exercise.Sets.Select(set => new Set
+                        {
+                            Repetitions = set.Repetitions,
+                            Weight = set.Weight
+                        }).ToList()
+                    };
+
+                    training.Exercises.Add(strengthExercise);
+                }
+
                 _context.Add(training);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(training);
+            return View(model);
         }
 
         // GET: Trainings/Edit/5
