@@ -36,31 +36,50 @@ namespace WorkoutTracker.Controllers
             }
 
             var training = await _context.Trainings
+                .Include(t => t.Exercises)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (training == null)
             {
                 return NotFound();
             }
 
-            return View(training);
+            var strengthExercises = training.Exercises
+                .OfType<StrengthExercise>()
+                .ToList();
+
+            foreach (var strengthExercise in strengthExercises)
+            {
+                await _context.Entry(strengthExercise)
+                    .Collection(se => se.Sets)
+                    .LoadAsync();
+            }
+
+            var trainingViewModel = new TrainingViewModel
+            {
+                Name = training.Name,
+                Description = training.Description,
+                Date = training.Date,
+                Exercises = new List<ExerciseViewModel>{}
+            };
+
+            foreach (var se in strengthExercises)
+            {
+                trainingViewModel.Exercises.Add(new ExerciseViewModel
+                {
+                    Name =  se.Name,
+                    Description = se.Description,
+                    Sets = se.Sets.ToList()
+                }); 
+            }
+
+            return View(trainingViewModel);
         }
 
         // GET: Trainings/Create
         public IActionResult Create()
         {
             return View(new TrainingViewModel());
-        }
-
-        // Action to return the exercise partial view
-        public PartialViewResult RenderExercisePartial(int exerciseIndex)
-        {
-            return PartialView("_ExercisePartial", exerciseIndex);
-        }
-
-        // Action to return the set partial view
-        public PartialViewResult RenderSetPartial(int exerciseIndex, int setIndex)
-        {
-            return PartialView("_SetPartial", Tuple.Create(exerciseIndex, setIndex));
         }
 
         // POST: Trainings/Create
