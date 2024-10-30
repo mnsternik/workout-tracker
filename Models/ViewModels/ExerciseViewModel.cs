@@ -13,6 +13,6 @@ namespace WorkoutTracker.Models.ViewModels
         [StringLength(300)]
         public string? Description { get; set; }
 
-        public List<Set> Sets { get; set; } = new List<Set>();
+        public List<SetViewModel> Sets { get; set; } = new List<SetViewModel>();
     }
 }
