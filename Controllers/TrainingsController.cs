@@ -37,7 +37,7 @@ namespace WorkoutTracker.Controllers
 
             var training = await _context.Trainings
                 .Include(t => t.Exercises)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (training == null)
             {
@@ -57,20 +57,26 @@ namespace WorkoutTracker.Controllers
 
             var trainingViewModel = new TrainingViewModel
             {
+                Id = training.Id,
                 Name = training.Name,
                 Description = training.Description,
                 Date = training.Date,
-                Exercises = new List<ExerciseViewModel>{}
+                Exercises = new List<ExerciseViewModel> { }
             };
 
             foreach (var se in strengthExercises)
             {
                 trainingViewModel.Exercises.Add(new ExerciseViewModel
                 {
-                    Name =  se.Name,
+                    Name = se.Name,
                     Description = se.Description,
-                    Sets = se.Sets.ToList()
-                }); 
+                    Sets = se.Sets.Select(set => new SetViewModel
+                    {
+                        Id = set.Id,
+                        Repetitions = set.Repetitions,
+                        Weight = set.Weight
+                    }).ToList()
+                });
             }
 
             return View(trainingViewModel);
@@ -95,7 +101,7 @@ namespace WorkoutTracker.Controllers
                     Name = model.Name,
                     Description = model.Description,
                     Date = model.Date,
-                    Exercises = new List<Exercise>{}
+                    Exercises = new List<Exercise> { }
                 };
 
                 foreach (var exercise in model.Exercises)
@@ -129,17 +135,54 @@ namespace WorkoutTracker.Controllers
                 return NotFound();
             }
 
-            var training = await _context.Trainings.FindAsync(id);
+            var training = await _context.Trainings
+                .Include(t => t.Exercises)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
             if (training == null)
             {
                 return NotFound();
             }
-            return View(training);
+
+            var strengthExercises = training.Exercises
+                   .OfType<StrengthExercise>()
+                   .ToList();
+
+            foreach (var strengthExercise in strengthExercises)
+            {
+                await _context.Entry(strengthExercise)
+                    .Collection(se => se.Sets)
+                    .LoadAsync();
+            }
+
+            var trainingViewModel = new TrainingViewModel
+            {
+                Id = training.Id,
+                Name = training.Name,
+                Description = training.Description,
+                Date = training.Date,
+                Exercises = new List<ExerciseViewModel> { }
+            };
+
+            foreach (var se in strengthExercises)
+            {
+                trainingViewModel.Exercises.Add(new ExerciseViewModel
+                {
+                    Name = se.Name,
+                    Description = se.Description,
+                    Sets = se.Sets.Select(set => new SetViewModel
+                    {
+                        Id = set.Id,
+                        Repetitions = set.Repetitions,
+                        Weight = set.Weight
+                    }).ToList()
+                });
+            }
+
+            return View(trainingViewModel);
         }
 
         // POST: Trainings/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Date")] Training training)
