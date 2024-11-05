@@ -68,6 +68,7 @@ namespace WorkoutTracker.Controllers
             {
                 trainingViewModel.Exercises.Add(new ExerciseViewModel
                 {
+                    Id = se.Id,
                     Name = se.Name,
                     Description = se.Description,
                     Sets = se.Sets.Select(set => new SetViewModel
@@ -168,6 +169,7 @@ namespace WorkoutTracker.Controllers
             {
                 trainingViewModel.Exercises.Add(new ExerciseViewModel
                 {
+                    Id = se.Id,
                     Name = se.Name,
                     Description = se.Description,
                     Sets = se.Sets.Select(set => new SetViewModel
@@ -185,15 +187,44 @@ namespace WorkoutTracker.Controllers
         // POST: Trainings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date")] Training training)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Name,Description,Exercises")] TrainingViewModel trainingViewModel)
         {
-            if (id != training.Id)
+            if (id != trainingViewModel.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
+                var training = await _context.Trainings
+                    .Include(t => t.Exercises)
+                    .ThenInclude(e => (e as StrengthExercise).Sets)
+                    .FirstOrDefaultAsync(t => t.Id == id);
+
+                if (training == null)
+                {
+                    return NotFound();
+                }
+
+                training.Name = trainingViewModel.Name;
+                training.Description = trainingViewModel.Description;
+                training.Exercises = new List<Exercise>{};
+
+                foreach (var exercise in trainingViewModel.Exercises)
+                {
+                    var strengthExercise = new StrengthExercise
+                    {
+                        Name = exercise.Name,
+                        Description = exercise.Description,
+                        Sets = exercise.Sets.Select(set => new Set
+                        {
+                            Repetitions = set.Repetitions,
+                            Weight = set.Weight
+                        }).ToList()
+                    };
+                    training.Exercises.Add(strengthExercise);
+                }
+
                 try
                 {
                     _context.Update(training);
@@ -212,7 +243,7 @@ namespace WorkoutTracker.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(training);
+            return View(trainingViewModel);
         }
 
         // GET: Trainings/Delete/5
