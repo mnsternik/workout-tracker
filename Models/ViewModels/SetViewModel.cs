@@ -6,11 +6,11 @@ namespace WorkoutTracker.Models.ViewModels
     {
         public int Id { get; set; }
 
-        [Range(1, 99)]
+        [Range(1, 999)]
         [Required]
         public int Repetitions { get; set; }
 
-        [Range(0, 999)]
-        public int? Weight { get; set; }
+        [Range(0, 9999)]
+        public float? Weight { get; set; } = 0;
     }
 }

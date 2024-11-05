@@ -17,5 +17,10 @@ namespace WorkoutTracker.Models.ViewModels
         public DateTime Date { get; set; }
 
         public List<ExerciseViewModel> Exercises { get; set; } = new List<ExerciseViewModel>();
+
+        public TrainingViewModel()
+        {
+            Date = DateTime.Now;
+        }
     }
 }
