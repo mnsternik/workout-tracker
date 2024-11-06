@@ -14,8 +14,8 @@ namespace WorkoutTracker.Models
 
         [DataType(DataType.Date)]
         [Required]
-        public DateTime Date { get; set; } 
+        public DateTime Date { get; set; }
 
         public ICollection<Exercise> Exercises { get; set; }
-    }
+    }  
 }
