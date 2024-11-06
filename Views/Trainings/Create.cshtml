@@ -1,85 +1,109 @@
 ﻿@model WorkoutTracker.Models.ViewModels.TrainingViewModel
 
-<form asp-action="Create" method="post" class="d-flex flex-column gap-2">
+<div x-data="exerciseForm()" class="container mt-5 col-md-8">
+    <form asp-action="Create" method="post" class="d-flex flex-column">
 
-    <div class="form-group col-md-3">
-        <label class="form-label" asp-for="Name"></label>
-        <input class="form-control" asp-for="Name" />
-    </div>
-
-    <div class="form-group">
-        <label class="form-label" asp-for="Description"></label>
-        <textarea class="form-control" asp-for="Description"></textarea>
-    </div>
-
-    <label class="form-label" asp-for="Exercises"></label>
-    <div id="exercises-container">
-        @for (int i = 0; i < Model.Exercises.Count; i++)
-        {
-            <div class="exercise" id="exercise-@i">
-                <h4>Exercise @i</h4>
-                <div class="form-group">
-                    <label class="form-label" asp-for="Exercises[i].Name"></label>
-                    <input class="form-control" asp-for="Exercises[i].Name" />
+        <div class="form-group d-flex flex-column gap-2">
+            <div class="d-flex col-12 justify-content-between">
+                <div class="col-3">
+                    <input class="form-control" asp-for="Name" placeholder="Training name" />
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label" asp-for="Exercises[i].Description"></label>
-                    <textarea class="form-control" asp-for="Exercises[i].Description"></textarea>
-                </div>
-
-                <div id="sets-container-@i">
-                    @for (int j = 0; j < Model.Exercises[i].Sets.Count; j++)
-                    {
-                        <div class="form-group set" id="set-@i-@j">
-                            <label class="form-label" asp-for="Exercises[i].Sets[j].Repetitions"></label>
-                            <input class="form-control" asp-for="Exercises[i].Sets[j].Repetitions" />
-
-                            <label class="form-label" asp-for="Exercises[i].Sets[j].Weight"></label>
-                            <input class="form-control" asp-for="Exercises[i].Sets[j].Weight" />
-                        </div>
-                    }
-                </div>
-
-                <button type="button" class="btn btn-primary add-set-btn" data-exercise-id="@i">Add Set</button>
+                <button type="submit" class="btn btn-success" style="width: 110px">Save</button>
             </div>
+            <textarea class="form-control" asp-for="Description" placeholder="Description"></textarea>
+        </div>
+
+
+        <div class="form-group">
+            <template x-for="(exercise, exerciseIndex) in exercises" :key="exerciseIndex">
+                <div class="card my-2">
+                    <div class="card-body shadow-lg">
+
+                        <div class="d-flex justify-content-between">
+
+                            <div class="form-group col-md-3 my-2">
+                                <input class="form-control" type="text" :id="'Exercises[' + exerciseIndex + '].Name'" :name="'Exercises[' + exerciseIndex + '].Name'" x-model="exercise.name" placeholder="Exercise name">
+                            </div>
+
+                            <a type="button" @@click="removeExercise(exerciseIndex)" class="btn-outline">
+                                <i class="fa-regular fa-circle-xmark" style="font-size: 22px; color: palevioletred"></i>
+                            </a>
+                        </div>
+
+
+                        <div class="form-group">
+                            <table class="table table-borderless">
+
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Reps</th>
+                                        <th>Weight</th>
+                                        <th</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <template x-for="(set, setIndex) in exercise.sets" :key="setIndex">
+                                        <tr>
+                                            <td x-text="setIndex + 1" style="align-content: center; text-align: center"></td>
+                                            <td>
+                                                <input class="form-control" type="number" :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'" :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'" x-model="set.repetitions">
+                                            </td>
+                                            <td>
+                                                <input class="form-control" type="number" :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Weight'" :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Weight'" x-model="set.weight">
+                                            </td>
+                                            <td style="align-content: center; text-align: center">
+                                                <a type="button" class="m-auto" @@click="exercise.sets.splice(setIndex, 1)">
+                                                    <i class="fa-solid fa-trash" style="font-size: 22px; color: palevioletred"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+
+                            @*                             <a type="button" class="btn" @@click="addSet(exercise)">
+                            <i class="fa-solid fa-plus" style="font-size: 26px; color: mediumseagreen"></i>
+                            </a> *@
+
+
+                            <button type="button" class="btn btn-success mx-auto" @@click="addSet(exercise)">Add Set</button>
+
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <button type="button" class="btn btn-success mx-auto" @@click="addExercise()">Add Strength Exercise</button>
+            <button type="button" class="btn btn-success mx-auto" @@click="addExercise()">Add Cardio Exercise</button>
+            <button type="button" class="btn btn-success mx-auto" @@click="addExercise()">Add Izometric Exercise</button>
+
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // Alpine.js data and methods for managing exercises and sets
+    function exerciseForm() {
+        return {
+            exercises: [
+                { name: '', description: '', sets: [{ repetitions: '', weight: '' }] } // Start with one exercise and one set
+            ],
+            addExercise() {
+                this.exercises.push({
+                    name: '',
+                    description: '',
+                    sets: [{ repetitions: '', weight: '' }] // Start with one empty set
+                });
+            },
+            removeExercise(index) {
+                this.exercises.splice(index, 1);
+            },
+            addSet(exercise) {
+                exercise.sets.push({ repetitions: '', weight: '' });
+            }
         }
-    </div>
-
-    <div class="form-group my-4">
-        <button type="button" class="btn btn-primary" id="add-exercise-btn">Add Exercise</button>
-        <button type="submit" class="btn btn-success">Submit</button>
-    </div>
-
-
-</form>
-
-@section Scripts {
-    <script>
-        let exerciseCount = @Model.Exercises.Count;
-        let setCounters = Array(exerciseCount).fill(0);
-
-        // Add Exercise Button Click Event
-        $('#add-exercise-btn').on('click', function () {
-            $.get('/Trainings/RenderExercisePartial', { exerciseIndex: exerciseCount }, function (data) {
-                $('#exercises-container').append(data);
-                setCounters.push(0); // Add new set counter for this exercise
-                exerciseCount++;
-            });
-        });
-
-        // Add Set Button Click Event
-        $(document).on('click', '.add-set-btn', function () {
-            const exerciseId = $(this).data('exercise-id');
-            const setCounter = setCounters[exerciseId];
-
-            $.get('/Trainings/RenderSetPartial', { exerciseIndex: exerciseId, setIndex: setCounter }, function (data) {
-                $(`#sets-container-${exerciseId}`).append(data);
-                setCounters[exerciseId]++;
-            });
-        });
-
-    </script>
-}
-
-
+    }
+</script>
