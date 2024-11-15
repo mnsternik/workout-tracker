@@ -1,18 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using static WorkoutTracker.Models.Exercise;
+using System.ComponentModel.DataAnnotations;
 
 namespace WorkoutTracker.Models.ViewModels
 {
     public class ExerciseViewModel
     {
-        public int Id { get; set; }
-
-        [StringLength(90, MinimumLength = 3)]
+        [StringLength(90, MinimumLength = 2)]
         [Required]
         public string Name { get; set; }
 
-        [StringLength(300)]
+        [StringLength(400)]
         public string? Description { get; set; }
 
-        public List<SetViewModel> Sets { get; set; } = new List<SetViewModel>();
+        [Required]
+        public ExerciseType Type { get; set; }
+
+        [Required]
+        public ICollection<SetViewModel> Sets { get; set; }
     }
 }
