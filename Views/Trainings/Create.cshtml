@@ -1,28 +1,46 @@
 ﻿@model WorkoutTracker.Models.ViewModels.TrainingViewModel
 
-<div x-data="exerciseForm()" class="container mt-5 col-md-8">
-    <form asp-action="Create" method="post" class="d-flex flex-column">
+<script>
+    const initialExercises = @Html.Raw(@Json.Serialize(Model.Exercises));
+</script>
+
+<div x-data="exerciseForm(initialExercises)" class="container mt-5 col-md-8">
+    <form asp-action="Create" method="post" id="trainingForm" class="d-flex flex-column">
 
         <div class="form-group d-flex flex-column gap-2">
             <div class="d-flex col-12 justify-content-between">
                 <div class="col-3">
                     <input class="form-control" asp-for="Name" placeholder="Training name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 <button type="submit" class="btn btn-success" style="width: 110px">Save</button>
             </div>
             <textarea class="form-control" asp-for="Description" placeholder="Description"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
-
 
         <div class="form-group">
             <template x-for="(exercise, exerciseIndex) in exercises" :key="exerciseIndex">
                 <div class="card my-2">
                     <div class="card-body shadow-lg">
 
+                        <input type="hidden"
+                               :name="'Exercises[' + exerciseIndex + '].Type'"
+                               :value="exercise.type" />
+
                         <div class="d-flex justify-content-between">
 
                             <div class="form-group col-md-3 my-2">
-                                <input class="form-control" type="text" :id="'Exercises[' + exerciseIndex + '].Name'" :name="'Exercises[' + exerciseIndex + '].Name'" x-model="exercise.name" placeholder="Exercise name">
+                                <div class="d-flex flex-row gap-1">
+                                    <input class="form-control" type="text"
+                                           :id="'Exercises[' + exerciseIndex + '].Name'"
+                                           :name="'Exercises[' + exerciseIndex + '].Name'"
+                                           x-model="exercise.name"
+                                           placeholder="Exercise name" />
+                                    <i x-show="exercise.type === 0" class="fa-solid fa-dumbbell exercise-type-icon"></i>
+                                    <i x-show="exercise.type === 1" class="fa-solid fa-person-running exercise-type-icon"></i>
+                                    <i x-show="exercise.type === 2" class="fa-solid fa-hourglass-half exercise-type-icon"></i>
+                                </div>
                             </div>
 
                             <a type="button" @@click="removeExercise(exerciseIndex)" class="btn-outline">
@@ -30,16 +48,17 @@
                             </a>
                         </div>
 
-
                         <div class="form-group">
                             <table class="table table-borderless">
 
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th>Reps</th>
-                                        <th>Weight</th>
-                                        <th</th>
+                                        <th x-show="exercise.type === 0">Reps</th>
+                                        <th x-show="exercise.type === 0">Weight</th>
+                                        <th x-show="exercise.type === 1 || exercise.type === 2">Duration</th>
+                                        <th x-show="exercise.type === 1">Distance</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
 
@@ -47,26 +66,54 @@
                                     <template x-for="(set, setIndex) in exercise.sets" :key="setIndex">
                                         <tr>
                                             <td x-text="setIndex + 1" style="align-content: center; text-align: center"></td>
-                                            <td>
-                                                <input class="form-control" type="number" :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'" :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'" x-model="set.repetitions">
+
+                                            <td x-show="exercise.type === 0">
+                                                <input class="form-control" type="number"
+                                                       :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'"
+                                                       :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'"
+                                                       x-model="set.repetitions"
+                                                       data-val="true" data-val-required="Repetitions are required for strength exercises." />
+                                                <span :data-valmsg-for="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'" class="text-danger"></span>
                                             </td>
-                                            <td>
-                                                <input class="form-control" type="number" :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Weight'" :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Weight'" x-model="set.weight">
+
+                                            <td x-show="exercise.type === 0">
+                                                <input class="form-control" type="number"
+                                                       :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Weight'"
+                                                       :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Weight'"
+                                                       x-model="set.weight" />
                                             </td>
+
+                                            <td x-show="exercise.type === 1 || exercise.type === 2">
+                                                <input class="form-control" type="number"
+                                                       :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'"
+                                                       :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'"
+                                                       x-model="set.duration"
+                                                       data-val="true" data-val-required="Duration is required for this exercise type." />
+                                                <span :data-valmsg-for="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'" class="text-danger"></span>
+                                            </td>
+
+                                            <td x-show="exercise.type === 1">
+                                                <input class="form-control" type="number"
+                                                       :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Distance'"
+                                                       :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Distance'"
+                                                       x-model="set.distance"
+                                                       data-val="true" data-val-required="Distance is required for cardio exercises." />
+                                                <span :data-valmsg-for="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Distance'" class="text-danger"></span>
+                                            </td>
+
                                             <td style="align-content: center; text-align: center">
                                                 <a type="button" class="m-auto" @@click="exercise.sets.splice(setIndex, 1)">
                                                     <i class="fa-solid fa-trash" style="font-size: 22px; color: palevioletred"></i>
                                                 </a>
+                                                <input hidden
+                                                       :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].ExerciseType'"
+                                                       :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].ExerciseType'"
+                                                       :value="set.ExerciseType" />
                                             </td>
                                         </tr>
                                     </template>
                                 </tbody>
                             </table>
-
-                            @*                             <a type="button" class="btn" @@click="addSet(exercise)">
-                            <i class="fa-solid fa-plus" style="font-size: 26px; color: mediumseagreen"></i>
-                            </a> *@
-
 
                             <button type="button" class="btn btn-success mx-auto" @@click="addSet(exercise)">Add Set</button>
 
@@ -75,35 +122,62 @@
                 </div>
             </template>
 
-            <button type="button" class="btn btn-success mx-auto" @@click="addExercise()">Add Strength Exercise</button>
-            <button type="button" class="btn btn-success mx-auto" @@click="addExercise()">Add Cardio Exercise</button>
-            <button type="button" class="btn btn-success mx-auto" @@click="addExercise()">Add Izometric Exercise</button>
-
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <button type="button" class="btn btn-success mx-auto" @@click="addExercise(0)">Add Strength Exercise</button>
+                <button type="button" class="btn btn-success mx-auto" @@click="addExercise(1)">Add Cardio Exercise</button>
+                <button type="button" class="btn btn-success mx-auto" @@click="addExercise(2)">Add Isometric Exercise</button>
+            </div
         </div>
-
     </form>
 </div>
 
 <script>
-    // Alpine.js data and methods for managing exercises and sets
-    function exerciseForm() {
+    function exerciseForm(initialExercises) {
         return {
-            exercises: [
-                { name: '', description: '', sets: [{ repetitions: '', weight: '' }] } // Start with one exercise and one set
-            ],
-            addExercise() {
+            exercises: initialExercises || [],
+            addExercise(type) {
                 this.exercises.push({
                     name: '',
                     description: '',
-                    sets: [{ repetitions: '', weight: '' }] // Start with one empty set
+                    type: type,
+                    sets: type === 0 ? [{ repetitions: '', weight: '', ExerciseType: type }] :
+                        type === 1 ? [{ duration: '', distance: '', ExerciseType: type }] :
+                            [{ duration: '', ExerciseType: type }]
                 });
+                $('#trainingForm').removeData("validator").removeData("unobtrusiveValidation");   // Added by jQuery Unobtrusive Validation
+                $.validator.unobtrusive.parse('#trainingForm');
             },
             removeExercise(index) {
                 this.exercises.splice(index, 1);
             },
             addSet(exercise) {
-                exercise.sets.push({ repetitions: '', weight: '' });
+                console.log(exercise.type);
+                if (exercise.type === 0) {
+                    exercise.sets.push({ repetitions: '', weight: '', ExerciseType: exercise.type });
+                } else if (exercise.type === 1) {
+                    exercise.sets.push({ duration: '', distance: '', ExerciseType: exercise.type });
+                } else if (exercise.type === 2) {
+                    exercise.sets.push({ duration: '', ExerciseType: exercise.type });
+                }
+                $('#trainingForm').removeData("validator").removeData("unobtrusiveValidation");   // Added by jQuery Unobtrusive Validation
+                $.validator.unobtrusive.parse('#trainingForm');
             }
-        }
+
+        };
     }
+    // Ensure validation works for dynamically added inputs
+    document.addEventListener("DOMContentLoaded", function () {
+        // Initialize validation
+        $('#trainingForm').removeData("validator").removeData("unobtrusiveValidation");   // Added by jQuery Unobtrusive Validation
+        $.validator.unobtrusive.parse('#trainingForm');
+    });
 </script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+    }
+}
+
