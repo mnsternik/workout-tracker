@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Data;
 using WorkoutTracker.Models;
 using WorkoutTracker.Models.ViewModels;
-
 namespace WorkoutTracker.Controllers
 {
     public class TrainingsController : Controller
@@ -44,43 +43,7 @@ namespace WorkoutTracker.Controllers
                 return NotFound();
             }
 
-            var strengthExercises = training.Exercises
-                .OfType<StrengthExercise>()
-                .ToList();
-
-            foreach (var strengthExercise in strengthExercises)
-            {
-                await _context.Entry(strengthExercise)
-                    .Collection(se => se.Sets)
-                    .LoadAsync();
-            }
-
-            var trainingViewModel = new TrainingViewModel
-            {
-                Id = training.Id,
-                Name = training.Name,
-                Description = training.Description,
-                Date = training.Date,
-                Exercises = new List<ExerciseViewModel> { }
-            };
-
-            foreach (var se in strengthExercises)
-            {
-                trainingViewModel.Exercises.Add(new ExerciseViewModel
-                {
-                    Id = se.Id,
-                    Name = se.Name,
-                    Description = se.Description,
-                    Sets = se.Sets.Select(set => new SetViewModel
-                    {
-                        Id = set.Id,
-                        Repetitions = set.Repetitions,
-                        Weight = set.Weight
-                    }).ToList()
-                });
-            }
-
-            return View(trainingViewModel);
+            return View(training);
         }
 
         // GET: Trainings/Create
@@ -101,24 +64,25 @@ namespace WorkoutTracker.Controllers
                 {
                     Name = model.Name,
                     Description = model.Description,
-                    Date = model.Date,
+                    Date = DateTime.UtcNow,
                     Exercises = new List<Exercise> { }
                 };
 
                 foreach (var exercise in model.Exercises)
                 {
-                    var strengthExercise = new StrengthExercise
+                    training.Exercises.Add(new Exercise
                     {
                         Name = exercise.Name,
                         Description = exercise.Description,
+                        Type = exercise.Type,
                         Sets = exercise.Sets.Select(set => new Set
                         {
                             Repetitions = set.Repetitions,
-                            Weight = set.Weight
+                            Weight = set.Weight,
+                            Distance = set.Distance,
+                            Duration = set.Duration
                         }).ToList()
-                    };
-
-                    training.Exercises.Add(strengthExercise);
+                    });
                 }
 
                 _context.Add(training);
@@ -145,51 +109,15 @@ namespace WorkoutTracker.Controllers
                 return NotFound();
             }
 
-            var strengthExercises = training.Exercises
-                   .OfType<StrengthExercise>()
-                   .ToList();
-
-            foreach (var strengthExercise in strengthExercises)
-            {
-                await _context.Entry(strengthExercise)
-                    .Collection(se => se.Sets)
-                    .LoadAsync();
-            }
-
-            var trainingViewModel = new TrainingViewModel
-            {
-                Id = training.Id,
-                Name = training.Name,
-                Description = training.Description,
-                Date = training.Date,
-                Exercises = new List<ExerciseViewModel> { }
-            };
-
-            foreach (var se in strengthExercises)
-            {
-                trainingViewModel.Exercises.Add(new ExerciseViewModel
-                {
-                    Id = se.Id,
-                    Name = se.Name,
-                    Description = se.Description,
-                    Sets = se.Sets.Select(set => new SetViewModel
-                    {
-                        Id = set.Id,
-                        Repetitions = set.Repetitions,
-                        Weight = set.Weight
-                    }).ToList()
-                });
-            }
-
-            return View(trainingViewModel);
+            return View(training);
         }
 
         // POST: Trainings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Name,Description,Exercises")] TrainingViewModel trainingViewModel)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Name,Description,Exercises")] Training model)
         {
-            if (id != trainingViewModel.Id)
+            if (id != model.Id)
             {
                 return NotFound();
             }
@@ -198,7 +126,7 @@ namespace WorkoutTracker.Controllers
             {
                 var training = await _context.Trainings
                     .Include(t => t.Exercises)
-                    .ThenInclude(e => (e as StrengthExercise).Sets)
+                    .ThenInclude(e => e.Sets)
                     .FirstOrDefaultAsync(t => t.Id == id);
 
                 if (training == null)
@@ -206,24 +134,9 @@ namespace WorkoutTracker.Controllers
                     return NotFound();
                 }
 
-                training.Name = trainingViewModel.Name;
-                training.Description = trainingViewModel.Description;
-                training.Exercises = new List<Exercise>{};
-
-                foreach (var exercise in trainingViewModel.Exercises)
-                {
-                    var strengthExercise = new StrengthExercise
-                    {
-                        Name = exercise.Name,
-                        Description = exercise.Description,
-                        Sets = exercise.Sets.Select(set => new Set
-                        {
-                            Repetitions = set.Repetitions,
-                            Weight = set.Weight
-                        }).ToList()
-                    };
-                    training.Exercises.Add(strengthExercise);
-                }
+                training.Name = model.Name;
+                training.Description = model.Description;
+                training.Exercises = model.Exercises;
 
                 try
                 {
@@ -243,7 +156,7 @@ namespace WorkoutTracker.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(trainingViewModel);
+            return View(model);
         }
 
         // GET: Trainings/Delete/5
