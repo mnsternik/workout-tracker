@@ -2,15 +2,15 @@
 
 namespace WorkoutTracker.Models
 {
+    public enum ExerciseType
+    {
+        Strength,
+        Cardio,
+        Isometric
+    }
+
     public class Exercise
     {
-        public enum ExerciseType
-        {
-            Strength,
-            Cardio,
-            Isometric
-        }
-
         public int Id { get; set; }
 
         [StringLength(90, MinimumLength = 3)]
