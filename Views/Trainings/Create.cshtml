@@ -10,13 +10,11 @@
         <div class="form-group d-flex flex-column gap-2">
             <div class="d-flex col-12 justify-content-between">
                 <div class="col-3">
-                    <input class="form-control" asp-for="Name" placeholder="Training name" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <input class="form-control" asp-for="Name" placeholder="Training name" data-val-required="Training name is required." />
                 </div>
                 <button type="submit" class="btn btn-success" style="width: 110px">Save</button>
             </div>
             <textarea class="form-control" asp-for="Description" placeholder="Description"></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="form-group">
@@ -36,7 +34,8 @@
                                            :id="'Exercises[' + exerciseIndex + '].Name'"
                                            :name="'Exercises[' + exerciseIndex + '].Name'"
                                            x-model="exercise.name"
-                                           placeholder="Exercise name" />
+                                           placeholder="Exercise name"
+                                           data-val="true" data-val-required="Name is required for each exercise." />
                                     <i x-show="exercise.type === 0" class="fa-solid fa-dumbbell exercise-type-icon"></i>
                                     <i x-show="exercise.type === 1" class="fa-solid fa-person-running exercise-type-icon"></i>
                                     <i x-show="exercise.type === 2" class="fa-solid fa-hourglass-half exercise-type-icon"></i>
@@ -55,9 +54,9 @@
                                     <tr>
                                         <th></th>
                                         <th x-show="exercise.type === 0">Reps</th>
-                                        <th x-show="exercise.type === 0">Weight</th>
-                                        <th x-show="exercise.type === 1 || exercise.type === 2">Duration</th>
-                                        <th x-show="exercise.type === 1">Distance</th>
+                                        <th x-show="exercise.type === 0">Weight (kg)</th>
+                                        <th x-show="exercise.type === 1 || exercise.type === 2">Duration (hh:mm)</th>
+                                        <th x-show="exercise.type === 1">Distance (km)</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -73,7 +72,6 @@
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'"
                                                        x-model="set.repetitions"
                                                        data-val="true" data-val-required="Repetitions are required for strength exercises." />
-                                                <span :data-valmsg-for="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'" class="text-danger"></span>
                                             </td>
 
                                             <td x-show="exercise.type === 0">
@@ -89,7 +87,6 @@
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'"
                                                        x-model="set.duration"
                                                        data-val="true" data-val-required="Duration is required for this exercise type." />
-                                                <span :data-valmsg-for="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'" class="text-danger"></span>
                                             </td>
 
                                             <td x-show="exercise.type === 1">
@@ -98,7 +95,6 @@
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Distance'"
                                                        x-model="set.distance"
                                                        data-val="true" data-val-required="Distance is required for cardio exercises." />
-                                                <span :data-valmsg-for="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Distance'" class="text-danger"></span>
                                             </td>
 
                                             <td style="align-content: center; text-align: center">
@@ -122,12 +118,12 @@
                 </div>
             </template>
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="row">
-                <button type="button" class="btn btn-success mx-auto" @@click="addExercise(0)">Add Strength Exercise</button>
-                <button type="button" class="btn btn-success mx-auto" @@click="addExercise(1)">Add Cardio Exercise</button>
-                <button type="button" class="btn btn-success mx-auto" @@click="addExercise(2)">Add Isometric Exercise</button>
-            </div
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+            <button type="button" class="btn btn-success mx-auto" @@click="addExercise(0)">Add Strength Exercise</button>
+            <button type="button" class="btn btn-success mx-auto" @@click="addExercise(1)">Add Cardio Exercise</button>
+            <button type="button" class="btn btn-success mx-auto" @@click="addExercise(2)">Add Isometric Exercise</button>
+
         </div>
     </form>
 </div>
@@ -136,23 +132,37 @@
     function exerciseForm(initialExercises) {
         return {
             exercises: initialExercises || [],
+
+            updateValidation() {
+                console.log("Validation updated");
+                setTimeout(() => {
+                    $('#trainingForm')
+                        .removeData("validator")
+                        .removeData("unobtrusiveValidation");
+                    $.validator.unobtrusive.parse('#trainingForm');
+                }, 0);
+            },
+
             addExercise(type) {
                 this.exercises.push({
                     name: '',
                     description: '',
                     type: type,
-                    sets: type === 0 ? [{ repetitions: '', weight: '', ExerciseType: type }] :
-                        type === 1 ? [{ duration: '', distance: '', ExerciseType: type }] :
-                            [{ duration: '', ExerciseType: type }]
+                    sets: type === 0
+                        ? [{ repetitions: '', weight: '', ExerciseType: type }]
+                        : type === 1
+                            ? [{ duration: '', distance: '', ExerciseType: type }]
+                            : [{ duration: '', ExerciseType: type }]
                 });
-                $('#trainingForm').removeData("validator").removeData("unobtrusiveValidation");   // Added by jQuery Unobtrusive Validation
-                $.validator.unobtrusive.parse('#trainingForm');
+                this.updateValidation();
             },
+
             removeExercise(index) {
                 this.exercises.splice(index, 1);
+                this.updateValidation();
             },
+
             addSet(exercise) {
-                console.log(exercise.type);
                 if (exercise.type === 0) {
                     exercise.sets.push({ repetitions: '', weight: '', ExerciseType: exercise.type });
                 } else if (exercise.type === 1) {
@@ -160,24 +170,25 @@
                 } else if (exercise.type === 2) {
                     exercise.sets.push({ duration: '', ExerciseType: exercise.type });
                 }
-                $('#trainingForm').removeData("validator").removeData("unobtrusiveValidation");   // Added by jQuery Unobtrusive Validation
-                $.validator.unobtrusive.parse('#trainingForm');
+                this.updateValidation();
             }
-
         };
     }
-    // Ensure validation works for dynamically added inputs
+
     document.addEventListener("DOMContentLoaded", function () {
-        // Initialize validation
-        $('#trainingForm').removeData("validator").removeData("unobtrusiveValidation");   // Added by jQuery Unobtrusive Validation
-        $.validator.unobtrusive.parse('#trainingForm');
+        $('#trainingForm').on('submit', function () {
+            setTimeout(() => {
+                $('#trainingForm')
+                    .removeData("validator")
+                    .removeData("unobtrusiveValidation");
+                $.validator.unobtrusive.parse('#trainingForm');
+            }, 0);
+        });
     });
 </script>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-
     }
 }
-
