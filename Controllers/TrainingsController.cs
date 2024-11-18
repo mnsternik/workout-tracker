@@ -36,6 +36,7 @@ namespace WorkoutTracker.Controllers
 
             var training = await _context.Trainings
                 .Include(t => t.Exercises)
+                .ThenInclude(e => e.Sets)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (training == null)
@@ -59,7 +60,6 @@ namespace WorkoutTracker.Controllers
         {
             if (ModelState.IsValid)
             {
-
                 var training = new Training
                 {
                     Name = model.Name,
@@ -102,6 +102,7 @@ namespace WorkoutTracker.Controllers
 
             var training = await _context.Trainings
                 .Include(t => t.Exercises)
+                .ThenInclude(e => e.Sets)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (training == null)
@@ -109,13 +110,39 @@ namespace WorkoutTracker.Controllers
                 return NotFound();
             }
 
-            return View(training);
+            var model = new TrainingViewModel
+            {
+                Name = training.Name,
+                Description = training.Description,
+                Date = training.Date,
+                Exercises = new List<ExerciseViewModel>()
+            };
+
+            foreach (var exercise in training.Exercises)
+            {
+                model.Exercises.Add(new ExerciseViewModel
+                {
+                    Name = exercise.Name,
+                    Description = exercise.Description,
+                    Type = exercise.Type,
+                    Sets = exercise.Sets.Select(s => new SetViewModel
+                    {
+                        ExerciseType = exercise.Type,
+                        Repetitions = s.Repetitions,
+                        Weight = s.Weight,
+                        Distance = s.Distance,
+                        Duration = s.Duration
+                    }).ToList()
+                });
+            }
+
+            return View(model);
         }
 
         // POST: Trainings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Name,Description,Exercises")] Training model)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Name,Description,Exercises")] TrainingViewModel model)
         {
             if (id != model.Id)
             {
@@ -136,7 +163,24 @@ namespace WorkoutTracker.Controllers
 
                 training.Name = model.Name;
                 training.Description = model.Description;
-                training.Exercises = model.Exercises;
+                training.Exercises = new List<Exercise>();
+
+                foreach (var exercise in model.Exercises)
+                {
+                    training.Exercises.Add(new Exercise
+                    {
+                        Name = exercise.Name,
+                        Description = exercise.Description,
+                        Type = exercise.Type,
+                        Sets = exercise.Sets.Select(set => new Set
+                        {
+                            Repetitions = set.Repetitions,
+                            Weight = set.Weight,
+                            Distance = set.Distance,
+                            Duration = set.Duration
+                        }).ToList()
+                    });
+                }
 
                 try
                 {
@@ -169,6 +213,7 @@ namespace WorkoutTracker.Controllers
 
             var training = await _context.Trainings
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (training == null)
             {
                 return NotFound();
