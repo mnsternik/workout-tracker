@@ -10,15 +10,16 @@ namespace WorkoutTracker.Models
         public Exercise Exercise { get; set; }
 
         public int? Repetitions { get; set; }
-        public float? Weight { get; set; }
-        public float? Distance { get; set; }
-        public float? Duration { get; set; }
+        public decimal? Weight { get; set; }
+        public decimal? Distance { get; set; }
+        public TimeSpan? Duration { get; set; }
+
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (Exercise == null)
             {
-                yield return new ValidationResult("Exercise is required.", [nameof(Exercise)]);
+                yield return new ValidationResult("Training must have at least one exercise.", [nameof(Exercise)]);
                 yield break;
             }
 
