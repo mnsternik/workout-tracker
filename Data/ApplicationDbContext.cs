@@ -11,20 +11,20 @@ namespace WorkoutTracker.Data
         { }
 
         public DbSet<Training> Trainings { get; set; }
-        public DbSet<CardioExercise> CardioExercises { get; set; }
-        public DbSet<StrengthExercise> StrengthExercises { get; set; }
+        public DbSet<Exercise> Exercises { get; set; }
         public DbSet<Set> Sets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Exercise>()
-                .HasDiscriminator<string>("ExerciseType")
-                .HasValue<CardioExercise>("Cardio")
-                .HasValue<StrengthExercise>("Strength");
+            modelBuilder.Entity<Set>()
+                .Property(s => s.Weight)
+                .HasPrecision(10, 2); 
+
+            modelBuilder.Entity<Set>()
+                .Property(s => s.Distance)
+                .HasPrecision(10, 2); 
         }
     }
-
-
 }
