@@ -55,7 +55,7 @@
                                         <th></th>
                                         <th x-show="exercise.type === 0">Reps</th>
                                         <th x-show="exercise.type === 0">Weight (kg)</th>
-                                        <th x-show="exercise.type === 1 || exercise.type === 2">Duration (hh:mm)</th>
+                                        <th x-show="exercise.type === 1 || exercise.type === 2">Duration (hh:mm:ss)</th>
                                         <th x-show="exercise.type === 1">Distance (km)</th>
                                         <th></th>
                                     </tr>
@@ -64,14 +64,15 @@
                                 <tbody>
                                     <template x-for="(set, setIndex) in exercise.sets" :key="setIndex">
                                         <tr>
-                                            <td x-text="setIndex + 1" style="align-content: center; text-align: center"></td>
+                                            <td x-text="setIndex + 1" style="align-content: center; text-align: center">
+
+                                            </td>
 
                                             <td x-show="exercise.type === 0">
                                                 <input class="form-control" type="number"
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'"
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'"
                                                        x-model="set.repetitions"
-                                                       data-val="true" data-val-required="Repetitions are required for strength exercises." />
                                             </td>
 
                                             <td x-show="exercise.type === 0">
@@ -82,11 +83,10 @@
                                             </td>
 
                                             <td x-show="exercise.type === 1 || exercise.type === 2">
-                                                <input class="form-control" type="number"
+                                                <input class="form-control" type="time" step="1"
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'"
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'"
                                                        x-model="set.duration"
-                                                       data-val="true" data-val-required="Duration is required for this exercise type." />
                                             </td>
 
                                             <td x-show="exercise.type === 1">
@@ -94,7 +94,6 @@
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Distance'"
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Distance'"
                                                        x-model="set.distance"
-                                                       data-val="true" data-val-required="Distance is required for cardio exercises." />
                                             </td>
 
                                             <td style="align-content: center; text-align: center">
