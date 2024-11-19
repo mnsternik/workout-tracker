@@ -80,7 +80,7 @@ namespace WorkoutTracker.Controllers
                             Repetitions = set.Repetitions,
                             Weight = set.Weight,
                             Distance = set.Distance,
-                            Duration = set.Duration
+                            Duration = set.Duration,
                         }).ToList()
                     });
                 }
@@ -125,13 +125,13 @@ namespace WorkoutTracker.Controllers
                     Name = exercise.Name,
                     Description = exercise.Description,
                     Type = exercise.Type,
-                    Sets = exercise.Sets.Select(s => new SetViewModel
+                    Sets = exercise.Sets.Select(set => new SetViewModel
                     {
                         ExerciseType = exercise.Type,
-                        Repetitions = s.Repetitions,
-                        Weight = s.Weight,
-                        Distance = s.Distance,
-                        Duration = s.Duration
+                        Repetitions = set.Repetitions,
+                        Weight = set.Weight,
+                        Distance = set.Distance,
+                        Duration = set.Duration,
                     }).ToList()
                 });
             }
@@ -177,7 +177,7 @@ namespace WorkoutTracker.Controllers
                             Repetitions = set.Repetitions,
                             Weight = set.Weight,
                             Distance = set.Distance,
-                            Duration = set.Duration
+                            Duration = set.Duration,
                         }).ToList()
                     });
                 }
