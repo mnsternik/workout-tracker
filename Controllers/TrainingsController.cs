@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.DotNet.Scaffolding.Shared.Project;
@@ -14,10 +15,12 @@ namespace WorkoutTracker.Controllers
     public class TrainingsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public TrainingsController(ApplicationDbContext context)
+        public TrainingsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Trainings
@@ -62,6 +65,7 @@ namespace WorkoutTracker.Controllers
             {
                 var training = new Training
                 {
+                    UserId = _userManager.GetUserId(User),
                     Name = model.Name,
                     Description = model.Description,
                     Date = DateTime.UtcNow,
