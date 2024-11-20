@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkoutTracker.Models
 {
@@ -18,5 +19,8 @@ namespace WorkoutTracker.Models
         public DateTime Date { get; set; }
 
         public ICollection<Exercise> Exercises { get; set; }
+
+        public string UserId { get; set; }
+        public ApplicationUser User { get; set; }
     }  
 }
