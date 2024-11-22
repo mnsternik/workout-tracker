@@ -1,0 +1,20 @@
+﻿@model IEnumerable<WorkoutTracker.Models.Training>
+
+<div class="container">
+    <div class="col-sm-10 gap-1 mx-auto d-flex flex-wrap">
+        @{
+            foreach (var training in Model)
+            {
+                <div class="card p-3 col-sm-3 shadow">
+                    <h6>@training.Name</h6>
+                    <p class="text-muted">@(training.User != null ? training.User.UserName : "Author unknown")</p>
+                    <p class="text-muted">@training.Date</p>
+                    <p>@training.Description</p>
+                    <a type="button" asp-action="Details" asp-route-id="@training.Id">
+                        Show
+                    </a>
+                </div>
+            }
+        }
+    </div>
+</div>
