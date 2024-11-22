@@ -26,7 +26,23 @@ namespace WorkoutTracker.Controllers
         // GET: Trainings
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Trainings.ToListAsync());
+            var userId = _userManager.GetUserId(User);
+
+            var trainings = await _context.Trainings
+                .Where(t => t.UserId == userId).
+                ToListAsync();
+
+            return View(trainings);
+        }
+
+        // GET: Discover/
+        public async Task<IActionResult> Discover()
+        {
+            var trainings = await _context.Trainings.
+                Include(t => t.User).
+                ToListAsync();
+
+            return View(trainings);
         }
 
         // GET: Trainings/Details/5
