@@ -6,10 +6,14 @@ namespace WorkoutTracker.Models.ViewModels
     public class SetViewModel : IValidatableObject
     {
         public int? Repetitions { get; set; }
-        public float? Weight { get; set; }
-        public float? Distance { get; set; }
-        public float? Duration { get; set; }
-        
+
+        [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
+        public decimal? Weight { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:0.##}", ApplyFormatInEditMode = true)]
+        public decimal? Distance { get; set; }
+        public TimeSpan? Duration { get; set; }
+
         [Required]
         public ExerciseType ExerciseType { get; set; }
 
