@@ -24,7 +24,7 @@ namespace WorkoutTracker.Controllers
         }
 
         // GET: Trainings
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string search)
         {
             var userId = _userManager.GetUserId(User);
 
@@ -32,17 +32,39 @@ namespace WorkoutTracker.Controllers
                 .Where(t => t.UserId == userId).
                 ToListAsync();
 
-            return View(trainings);
+            if (!string.IsNullOrEmpty(search))
+            {
+                trainings = trainings.Where(t => t.Name!.Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            }
+
+            var trainingsListViewModel = new TrainingsListViewModel
+            {
+                Trainings = trainings,
+                SearchString = search
+            }; 
+
+            return View(trainingsListViewModel);
         }
 
         // GET: Discover/
-        public async Task<IActionResult> Discover()
+        public async Task<IActionResult> Discover(string search)
         {
             var trainings = await _context.Trainings.
                 Include(t => t.User).
                 ToListAsync();
 
-            return View(trainings);
+            if (!string.IsNullOrEmpty(search))
+            {
+                trainings = trainings.Where(t => t.Name!.Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            }
+
+            var trainingsListViewModel = new TrainingsListViewModel
+            {
+                Trainings = trainings,
+                SearchString = search
+            };
+
+            return View(trainingsListViewModel);
         }
 
         // GET: Trainings/Details/5
