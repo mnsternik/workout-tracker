@@ -1,6 +1,8 @@
-﻿namespace WorkoutTracker.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace WorkoutTracker.Models
 {
-    public class ApplicationUser
+    public class ApplicationUser : IdentityUser
     {
     }
 }
