@@ -1,26 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.DotNet.Scaffolding.Shared.Project;
 using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Data;
 using WorkoutTracker.Models;
 using WorkoutTracker.Models.ViewModels;
+using WorkoutTracker.Services.Mappers;
+
 namespace WorkoutTracker.Controllers
 {
     public class TrainingsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly TrainingMapper _trainingMapper; 
 
-        public TrainingsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public TrainingsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, TrainingMapper trainingMapper)
         {
             _context = context;
             _userManager = userManager;
+            _trainingMapper = trainingMapper;
         }
 
         // GET: Trainings
@@ -41,7 +39,7 @@ namespace WorkoutTracker.Controllers
             {
                 Trainings = trainings,
                 SearchString = search
-            }; 
+            };
 
             return View(trainingsListViewModel);
         }
@@ -51,6 +49,7 @@ namespace WorkoutTracker.Controllers
         {
             var trainings = await _context.Trainings.
                 Include(t => t.User).
+                Include(t => t.Exercises).
                 ToListAsync();
 
             if (!string.IsNullOrEmpty(search))
@@ -101,32 +100,7 @@ namespace WorkoutTracker.Controllers
         {
             if (ModelState.IsValid)
             {
-                var training = new Training
-                {
-                    UserId = _userManager.GetUserId(User),
-                    Name = model.Name,
-                    Description = model.Description,
-                    Date = DateTime.UtcNow,
-                    Exercises = new List<Exercise> { }
-                };
-
-                foreach (var exercise in model.Exercises)
-                {
-                    training.Exercises.Add(new Exercise
-                    {
-                        Name = exercise.Name,
-                        Description = exercise.Description,
-                        Type = exercise.Type,
-                        Sets = exercise.Sets.Select(set => new Set
-                        {
-                            Repetitions = set.Repetitions,
-                            Weight = set.Weight,
-                            Distance = set.Distance,
-                            Duration = set.Duration,
-                        }).ToList()
-                    });
-                }
-
+                var training = _trainingMapper.MapToTraining(model, _userManager.GetUserId(User));
                 _context.Add(training);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -152,32 +126,7 @@ namespace WorkoutTracker.Controllers
                 return NotFound();
             }
 
-            var model = new TrainingViewModel
-            {
-                Name = training.Name,
-                Description = training.Description,
-                Date = training.Date,
-                Exercises = new List<ExerciseViewModel>()
-            };
-
-            foreach (var exercise in training.Exercises)
-            {
-                model.Exercises.Add(new ExerciseViewModel
-                {
-                    Name = exercise.Name,
-                    Description = exercise.Description,
-                    Type = exercise.Type,
-                    Sets = exercise.Sets.Select(set => new SetViewModel
-                    {
-                        ExerciseType = exercise.Type,
-                        Repetitions = set.Repetitions,
-                        Weight = set.Weight,
-                        Distance = set.Distance,
-                        Duration = set.Duration,
-                    }).ToList()
-                });
-            }
-
+            var model = _trainingMapper.MapToViewModel(training);
             return View(model);
         }
 
@@ -191,38 +140,24 @@ namespace WorkoutTracker.Controllers
                 return NotFound();
             }
 
+            var training = await _context.Trainings
+                .Include(t => t.Exercises)
+                .ThenInclude(e => e.Sets)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (training == null)
+            {
+                return NotFound();
+            }
+
+            if (training.UserId != _userManager.GetUserId(User))
+            {
+                return Unauthorized();
+            }
+
             if (ModelState.IsValid)
             {
-                var training = await _context.Trainings
-                    .Include(t => t.Exercises)
-                    .ThenInclude(e => e.Sets)
-                    .FirstOrDefaultAsync(t => t.Id == id);
-
-                if (training == null)
-                {
-                    return NotFound();
-                }
-
-                training.Name = model.Name;
-                training.Description = model.Description;
-                training.Exercises = new List<Exercise>();
-
-                foreach (var exercise in model.Exercises)
-                {
-                    training.Exercises.Add(new Exercise
-                    {
-                        Name = exercise.Name,
-                        Description = exercise.Description,
-                        Type = exercise.Type,
-                        Sets = exercise.Sets.Select(set => new Set
-                        {
-                            Repetitions = set.Repetitions,
-                            Weight = set.Weight,
-                            Distance = set.Distance,
-                            Duration = set.Duration,
-                        }).ToList()
-                    });
-                }
+                training = _trainingMapper.MapToTraining(model, training);
 
                 try
                 {
