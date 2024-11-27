@@ -13,6 +13,10 @@ namespace WorkoutTracker.Models
     {
         public int Id { get; set; }
 
+        public int TrainingId { get; set; }
+
+        public Training Training { get; set; }
+
         [StringLength(90, MinimumLength = 3)]
         [Required]
         public string Name { get; set; }
