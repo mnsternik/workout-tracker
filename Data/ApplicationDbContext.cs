@@ -24,7 +24,19 @@ namespace WorkoutTracker.Data
 
             modelBuilder.Entity<Set>()
                 .Property(s => s.Distance)
-                .HasPrecision(10, 2); 
+                .HasPrecision(10, 2);
+
+            modelBuilder.Entity<Exercise>()
+                .HasMany(e => e.Sets)
+                .WithOne(s => s.Exercise)
+                .HasForeignKey(s => s.ExerciseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Training>()
+                .HasMany(t => t.Exercises)
+                .WithOne(e => e.Training)
+                .HasForeignKey(e => e.TrainingId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
