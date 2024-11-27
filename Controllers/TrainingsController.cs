@@ -12,7 +12,7 @@ namespace WorkoutTracker.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ITrainingMapper _trainingMapper; 
+        private readonly ITrainingMapper _trainingMapper;
 
         public TrainingsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITrainingMapper trainingMapper)
         {
@@ -24,16 +24,14 @@ namespace WorkoutTracker.Controllers
         // GET: Trainings
         public async Task<IActionResult> Index(string search)
         {
-            var userId = _userManager.GetUserId(User);
-
-            var trainings = await _context.Trainings
-                .Where(t => t.UserId == userId)
-                .ToListAsync();
+            var query = _context.Trainings.Where(t => t.UserId == _userManager.GetUserId(User));
 
             if (!string.IsNullOrEmpty(search))
             {
-                trainings = trainings.Where(t => t.Name!.Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                query = query.Where(t => t.Name!.Contains(search, StringComparison.CurrentCultureIgnoreCase));
             }
+
+            var trainings = await query.ToListAsync();
 
             var trainingsListViewModel = new TrainingsListViewModel
             {
@@ -84,6 +82,8 @@ namespace WorkoutTracker.Controllers
                 return NotFound();
             }
 
+            ViewData["IsAuthor"] = training.UserId == _userManager.GetUserId(User);
+
             return View(training);
         }
 
@@ -126,6 +126,11 @@ namespace WorkoutTracker.Controllers
                 return NotFound();
             }
 
+            if (!await IsAuthorizedToPerformActionOnTraining(training.Id))
+            {
+                return Unauthorized();
+            }
+
             var model = _trainingMapper.MapToViewModel(training);
             return View(model);
         }
@@ -150,7 +155,7 @@ namespace WorkoutTracker.Controllers
                 return NotFound();
             }
 
-            if (training.UserId != _userManager.GetUserId(User))
+            if (!await IsAuthorizedToPerformActionOnTraining(id))
             {
                 return Unauthorized();
             }
@@ -204,7 +209,18 @@ namespace WorkoutTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var training = await _context.Trainings.FindAsync(id);
+            if (!await IsAuthorizedToPerformActionOnTraining(id))
+            {
+                return Unauthorized();
+            }
+
+            var training = await _context.Trainings
+                .Where(t => t.Id == id)
+                .Include(t => t.Exercises)
+                .ThenInclude(e => e.Sets)
+                .FirstOrDefaultAsync();
+
+
             if (training != null)
             {
                 _context.Trainings.Remove(training);
@@ -217,6 +233,12 @@ namespace WorkoutTracker.Controllers
         private bool TrainingExists(int id)
         {
             return _context.Trainings.Any(e => e.Id == id);
+        }
+
+        private async Task<bool> IsAuthorizedToPerformActionOnTraining(int trainingId)
+        {
+            var training = await _context.Trainings.FindAsync(trainingId);
+            return training?.UserId == _userManager.GetUserId(User);
         }
     }
 }
