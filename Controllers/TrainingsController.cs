@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Data;
 using WorkoutTracker.Models;
 using WorkoutTracker.Models.ViewModels;
-using WorkoutTracker.Services.Mappers;
+using WorkoutTracker.Services.Interfaces;
 
 namespace WorkoutTracker.Controllers
 {
@@ -12,9 +12,9 @@ namespace WorkoutTracker.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly TrainingMapper _trainingMapper; 
+        private readonly ITrainingMapper _trainingMapper; 
 
-        public TrainingsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, TrainingMapper trainingMapper)
+        public TrainingsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITrainingMapper trainingMapper)
         {
             _context = context;
             _userManager = userManager;
@@ -27,8 +27,8 @@ namespace WorkoutTracker.Controllers
             var userId = _userManager.GetUserId(User);
 
             var trainings = await _context.Trainings
-                .Where(t => t.UserId == userId).
-                ToListAsync();
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -47,10 +47,10 @@ namespace WorkoutTracker.Controllers
         // GET: Discover/
         public async Task<IActionResult> Discover(string search)
         {
-            var trainings = await _context.Trainings.
-                Include(t => t.User).
-                Include(t => t.Exercises).
-                ToListAsync();
+            var trainings = await _context.Trainings
+                .Include(t => t.User)
+                .Include(t => t.Exercises)
+                .ToListAsync();
 
             if (!string.IsNullOrEmpty(search))
             {
