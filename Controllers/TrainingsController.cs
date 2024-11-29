@@ -5,6 +5,7 @@ using WorkoutTracker.Data;
 using WorkoutTracker.Models;
 using WorkoutTracker.Models.ViewModels;
 using WorkoutTracker.Services.Interfaces;
+using WorkoutTracker.Utilities;
 
 namespace WorkoutTracker.Controllers
 {
@@ -14,6 +15,8 @@ namespace WorkoutTracker.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITrainingMapper _trainingMapper;
 
+        const int pageSize = 10; 
+
         public TrainingsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITrainingMapper trainingMapper)
         {
             _context = context;
@@ -22,7 +25,7 @@ namespace WorkoutTracker.Controllers
         }
 
         // GET: Trainings
-        public async Task<IActionResult> Index(string search)
+        public async Task<IActionResult> Index(string search, int pageIndex = 1)
         {
             var query = _context.Trainings.Where(t => t.UserId == _userManager.GetUserId(User));
 
@@ -31,33 +34,34 @@ namespace WorkoutTracker.Controllers
                 query = query.Where(t => t.Name!.Contains(search, StringComparison.CurrentCultureIgnoreCase));
             }
 
-            var trainings = await query.ToListAsync();
+            var paginatedTrainings = await PaginatedList<Training>.CreateAsync(query, pageIndex, pageSize); 
 
             var trainingsListViewModel = new TrainingsListViewModel
             {
-                Trainings = trainings,
+                Trainings = paginatedTrainings,
                 SearchString = search
             };
 
             return View(trainingsListViewModel);
         }
 
-        // GET: Discover/
-        public async Task<IActionResult> Discover(string search)
+        // GET: Discover
+        public async Task<IActionResult> Discover(string search, int pageIndex = 1)
         {
-            var trainings = await _context.Trainings
+            IQueryable<Training> query = _context.Trainings
                 .Include(t => t.User)
-                .Include(t => t.Exercises)
-                .ToListAsync();
+                .Include(t => t.Exercises);
 
             if (!string.IsNullOrEmpty(search))
             {
-                trainings = trainings.Where(t => t.Name!.Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                query = query.Where(t => t.Name!.Contains(search, StringComparison.CurrentCultureIgnoreCase));
             }
+
+            var paginatedTrainings = await PaginatedList<Training>.CreateAsync(query, pageIndex, pageSize);
 
             var trainingsListViewModel = new TrainingsListViewModel
             {
-                Trainings = trainings,
+                Trainings = paginatedTrainings,
                 SearchString = search
             };
 
