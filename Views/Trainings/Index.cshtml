@@ -1,28 +1,31 @@
-﻿@model IEnumerable<WorkoutTracker.Models.Training>
-
-@{
-    ViewData["Title"] = "Index";
-}
+﻿@model WorkoutTracker.Models.ViewModels.TrainingsListViewModel
 
 <div class="container col-md-8">
     <div class="my-2 d-flex justify-content-end">
         <a asp-action="Create" class="btn btn-success">New traning</a>
     </div>
 
-    <table class="table table-hover">
+    <form asp-controller="Trainings" asp-action="Index" method="get">
+        <div class="d-flex gap-1 col-sm-6">
+            <input class="form-control" type="text" name="search" placeholder="Training name"/>
+            <input type="submit" value="Search" class="btn btn-outline-secondary" />
+        </div>
+    </form>
+
+    <table class="table table-hover mt-2">
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Name)
+                    @Html.DisplayNameFor(model => model.Trainings[0].Name)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Date)
+                    @Html.DisplayNameFor(model => model.Trainings[0].Date)
                 </th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.Trainings)
             {
                 <tr>
                     <td>
@@ -40,5 +43,37 @@
             }
         </tbody>
     </table>
+    <nav>
+        <ul class="pagination">
+            @if (Model.Trainings.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-pageIndex="@(Model.Trainings.PageIndex - 1)" asp-route-search="@Model.SearchString">Previous</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            }
+
+            @for (int i = 1; i <= Model.Trainings.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Trainings.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-route-pageIndex="@i" asp-route-search="@Model.SearchString">@i</a>
+                </li>
+            }
+
+            @if (Model.Trainings.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-pageIndex="@(Model.Trainings.PageIndex + 1)" asp-route-search="@Model.SearchString">Next</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+            }
+        </ul>
+    </nav>
 
 </div>
