@@ -30,6 +30,9 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Trainings" asp-action="Discover">Discover</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Trainings" asp-action="Create">New Training</a>
+                        </li>
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -44,17 +47,12 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - WorkoutTracker - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2024 - WorkoutTracker
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
-    <!-- jQuery Validation scripts for unobtrusive validation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
-
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
