@@ -24,14 +24,17 @@ namespace WorkoutTracker.Controllers
             _trainingMapper = trainingMapper;
         }
 
-        // GET: Trainings
+        [Route("")]
+        [Route("Trainings")]
+        [Route("Trainings/Index")]
+        [HttpGet]
         public async Task<IActionResult> Index(string search, int pageIndex = 1)
         {
             var query = _context.Trainings.Where(t => t.UserId == _userManager.GetUserId(User));
 
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(t => t.Name!.Contains(search, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(t => t.Name.ToLower().Contains(search.ToLower()));
             }
 
             var paginatedTrainings = await PaginatedList<Training>.CreateAsync(query, pageIndex, pageSize); 
@@ -45,7 +48,8 @@ namespace WorkoutTracker.Controllers
             return View(trainingsListViewModel);
         }
 
-        // GET: Discover
+        [Route("Trainings/Discover")]
+        [HttpGet]
         public async Task<IActionResult> Discover(string search, int pageIndex = 1)
         {
             IQueryable<Training> query = _context.Trainings
@@ -54,7 +58,7 @@ namespace WorkoutTracker.Controllers
 
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(t => t.Name!.Contains(search, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(t => t.Name.ToLower().Contains(search.ToLower()));
             }
 
             var paginatedTrainings = await PaginatedList<Training>.CreateAsync(query, pageIndex, pageSize);
@@ -68,7 +72,8 @@ namespace WorkoutTracker.Controllers
             return View(trainingsListViewModel);
         }
 
-        // GET: Trainings/Details/5
+        [Route("Trainings/Details/{id:int}")]
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -91,13 +96,14 @@ namespace WorkoutTracker.Controllers
             return View(training);
         }
 
-        // GET: Trainings/Create
+        [Route("Trainings/Create")]
+        [HttpGet]
         public IActionResult Create()
         {
             return View(new TrainingViewModel());
         }
 
-        // POST: Trainings/Create
+        [Route("Trainings/Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TrainingViewModel model)
@@ -112,7 +118,8 @@ namespace WorkoutTracker.Controllers
             return View(model);
         }
 
-        // GET: Trainings/Edit/5
+        [Route("Trainings/Edit/{id:int}")]
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -139,7 +146,7 @@ namespace WorkoutTracker.Controllers
             return View(model);
         }
 
-        // POST: Trainings/Edit/5
+        [Route("Trainings/Edit/{id:int}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Date,Name,Description,Exercises")] TrainingViewModel model)
@@ -189,7 +196,8 @@ namespace WorkoutTracker.Controllers
             return View(model);
         }
 
-        // GET: Trainings/Delete/5
+        [Route("Trainings/Delete/{id:int}")]
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -208,8 +216,8 @@ namespace WorkoutTracker.Controllers
             return View(training);
         }
 
-        // POST: Trainings/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [Route("Trainings/Delete/{id:int}")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
