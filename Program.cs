@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
         .AddEntityFrameworkStores<ApplicationDbContext>();
 
     builder.Services.AddControllersWithViews();
-
+ 
     // Custom services
     builder.Services.AddScoped<ITrainingMapper, TrainingMapper>(); 
 }
