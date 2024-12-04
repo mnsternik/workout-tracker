@@ -1,7 +1,7 @@
 ﻿@model WorkoutTracker.Models.ViewModels.TrainingViewModel
 
 <script>
-    const initialExercises = @Html.Raw(@Json.Serialize(Model.Exercises));
+    const initialExercises = @Html.Raw(@Json.Serialize(Model.Exercises))
 </script>
 
 <div x-data="exerciseForm(initialExercises)" class="container mt-5 col-md-8">
@@ -40,6 +40,13 @@
                                     <i x-show="exercise.type === 1" class="fa-solid fa-person-running exercise-type-icon"></i>
                                     <i x-show="exercise.type === 2" class="fa-solid fa-hourglass-half exercise-type-icon"></i>
                                 </div>
+
+                                @* <textarea class="form-control" type="text" *@
+                                @*        :id="'Exercises[' + exerciseIndex + '].Description'" *@
+                                @*        :name="'Exercises[' + exerciseIndex + '].Description'" *@
+                                @*        x-model="exercise.description" *@
+                                @*        placeholder="Exercise description"></textarea> *@
+
                             </div>
 
                             <a type="button" @@click="removeExercise(exerciseIndex)" class="btn-outline">
@@ -72,28 +79,32 @@
                                                 <input class="form-control" type="number"
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'"
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'"
-                                                       x-model="set.repetitions"
+                                                       x-model="set.repetitions" 
+                                                       data-val="true" />
                                             </td>
 
                                             <td x-show="exercise.type === 0">
-                                                <input class="form-control" type="number"
+                                                <input class="form-control" type="number" step="any"
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Weight'"
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Weight'"
-                                                       x-model="set.weight" />
+                                                       x-model="set.weight"
+                                                       data-val="true" />
                                             </td>
 
                                             <td x-show="exercise.type === 1 || exercise.type === 2">
                                                 <input class="form-control" type="time" step="1"
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'"
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'"
-                                                       x-model="set.duration"
+                                                       x-model="set.duration" 
+                                                       data-val="true" />
                                             </td>
 
                                             <td x-show="exercise.type === 1">
-                                                <input class="form-control" type="number"
+                                                <input class="form-control" type="number" step="any"
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Distance'"
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Distance'"
-                                                       x-model="set.distance"
+                                                       x-model="set.distance" 
+                                                       data-val="true" />
                                             </td>
 
                                             <td style="align-content: center; text-align: center">
@@ -103,7 +114,7 @@
                                                 <input hidden
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].ExerciseType'"
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].ExerciseType'"
-                                                       :value="set.ExerciseType" />
+                                                       :value="set.exerciseType" />
                                             </td>
                                         </tr>
                                     </template>
@@ -148,10 +159,10 @@
                     description: '',
                     type: type,
                     sets: type === 0
-                        ? [{ repetitions: '', weight: '', ExerciseType: type }]
+                        ? [{ repetitions: '', weight: '', exerciseType: type }]
                         : type === 1
-                            ? [{ duration: '', distance: '', ExerciseType: type }]
-                            : [{ duration: '', ExerciseType: type }]
+                            ? [{ duration: '', distance: '', exerciseType: type }]
+                            : [{ duration: '', exerciseType: type }]
                 });
                 this.updateValidation();
             },
@@ -163,11 +174,11 @@
 
             addSet(exercise) {
                 if (exercise.type === 0) {
-                    exercise.sets.push({ repetitions: '', weight: '', ExerciseType: exercise.type });
+                    exercise.sets.push({ repetitions: '', weight: '', exerciseType: exercise.type });
                 } else if (exercise.type === 1) {
-                    exercise.sets.push({ duration: '', distance: '', ExerciseType: exercise.type });
+                    exercise.sets.push({ duration: '', distance: '', exerciseType: exercise.type });
                 } else if (exercise.type === 2) {
-                    exercise.sets.push({ duration: '', ExerciseType: exercise.type });
+                    exercise.sets.push({ duration: '', exerciseType: exercise.type });
                 }
                 this.updateValidation();
             }
@@ -191,3 +202,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+<!-- jQuery Validation scripts for unobtrusive validation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
