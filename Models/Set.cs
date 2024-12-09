@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static WorkoutTracker.Models.Exercise;
 
 namespace WorkoutTracker.Models
 {
