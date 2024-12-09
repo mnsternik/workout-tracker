@@ -58,7 +58,7 @@
                                         <th></th>
                                         <th x-show="exercise.type === 0">Reps</th>
                                         <th x-show="exercise.type === 0">Weight (kg)</th>
-                                        <th x-show="exercise.type === 1 || exercise.type === 2">Duration (hh:mm)</th>
+                                        <th x-show="exercise.type === 1 || exercise.type === 2">Duration (hh:mm:ss)</th>
                                         <th x-show="exercise.type === 1">Distance (km)</th>
                                         <th></th>
                                     </tr>
@@ -67,10 +67,12 @@
                                 <tbody>
                                     <template x-for="(set, setIndex) in exercise.sets" :key="setIndex">
                                         <tr>
-                                            <td x-text="setIndex + 1" style="align-content: center; text-align: center"></td>
+                                            <td x-text="setIndex + 1" style="align-content: center; text-align: center">
+       
+                                            </td>
 
                                             <td x-show="exercise.type === 0">
-                                                <input class="form-control" type="number"
+                                                <input class="form-control" type="number" 
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'"
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Repetitions'"
                                                        x-model="set.repetitions"
@@ -85,7 +87,7 @@
                                             </td>
 
                                             <td x-show="exercise.type === 1 || exercise.type === 2">
-                                                <input class="form-control" type="number"
+                                                <input class="form-control" type="time" step="1"
                                                        :id="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'"
                                                        :name="'Exercises[' + exerciseIndex + '].Sets[' + setIndex + '].Duration'"
                                                        x-model="set.duration"
@@ -155,10 +157,10 @@
                     description: '',
                     type: type,
                     sets: type === 0
-                        ? [{ repetitions: '', weight: '', ExerciseType: type }]
+                        ? [{ repetitions: '', weight: '', exerciseType: type }]
                         : type === 1
-                            ? [{ duration: '', distance: '', ExerciseType: type }]
-                            : [{ duration: '', ExerciseType: type }]
+                            ? [{ duration: '', distance: '', exerciseType: type }]
+                            : [{ duration: '', exerciseType: type }]
                 });
                 this.updateValidation();
             },
@@ -170,11 +172,11 @@
 
             addSet(exercise) {
                 if (exercise.type === 0) {
-                    exercise.sets.push({ repetitions: '', weight: '', ExerciseType: exercise.type });
+                    exercise.sets.push({ repetitions: '', weight: '', exerciseType: exercise.type });
                 } else if (exercise.type === 1) {
-                    exercise.sets.push({ duration: '', distance: '', ExerciseType: exercise.type });
+                    exercise.sets.push({ duration: '', distance: '', exerciseType: exercise.type });
                 } else if (exercise.type === 2) {
-                    exercise.sets.push({ duration: '', ExerciseType: exercise.type });
+                    exercise.sets.push({ duration: '', exerciseType: exercise.type });
                 }
                 this.updateValidation();
             }

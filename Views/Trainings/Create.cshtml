@@ -1,7 +1,7 @@
 ﻿@model WorkoutTracker.Models.ViewModels.TrainingViewModel
 
 <script>
-    const initialExercises = @Html.Raw(@Json.Serialize(Model.Exercises))
+    const initialExercises = @Html.Raw(@Json.Serialize(Model.Exercises));
 </script>
 
 <div x-data="exerciseForm(initialExercises)" class="container mt-5 col-md-8">
@@ -138,71 +138,10 @@
     </form>
 </div>
 
-<script>
-    function exerciseForm(initialExercises) {
-        return {
-            exercises: initialExercises || [],
-
-            updateValidation() {
-                console.log("Validation updated");
-                setTimeout(() => {
-                    $('#trainingForm')
-                        .removeData("validator")
-                        .removeData("unobtrusiveValidation");
-                    $.validator.unobtrusive.parse('#trainingForm');
-                }, 0);
-            },
-
-            addExercise(type) {
-                this.exercises.push({
-                    name: '',
-                    description: '',
-                    type: type,
-                    sets: type === 0
-                        ? [{ repetitions: '', weight: '', exerciseType: type }]
-                        : type === 1
-                            ? [{ duration: '', distance: '', exerciseType: type }]
-                            : [{ duration: '', exerciseType: type }]
-                });
-                this.updateValidation();
-            },
-
-            removeExercise(index) {
-                this.exercises.splice(index, 1);
-                this.updateValidation();
-            },
-
-            addSet(exercise) {
-                if (exercise.type === 0) {
-                    exercise.sets.push({ repetitions: '', weight: '', exerciseType: exercise.type });
-                } else if (exercise.type === 1) {
-                    exercise.sets.push({ duration: '', distance: '', exerciseType: exercise.type });
-                } else if (exercise.type === 2) {
-                    exercise.sets.push({ duration: '', exerciseType: exercise.type });
-                }
-                this.updateValidation();
-            }
-        };
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        $('#trainingForm').on('submit', function () {
-            setTimeout(() => {
-                $('#trainingForm')
-                    .removeData("validator")
-                    .removeData("unobtrusiveValidation");
-                $.validator.unobtrusive.parse('#trainingForm');
-            }, 0);
-        });
-    });
-</script>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="/js/exerciseForm.js"></script>
     }
 }
-
 <!-- jQuery Validation scripts for unobtrusive validation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>

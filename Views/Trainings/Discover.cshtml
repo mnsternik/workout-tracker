@@ -1,20 +1,92 @@
-﻿@model IEnumerable<WorkoutTracker.Models.Training>
+﻿@model WorkoutTracker.Models.ViewModels.TrainingsListViewModel
+
+@{
+    Func<ExerciseType, string?> ExerciseTypeTag = type =>
+    {
+        if (type == ExerciseType.Strength)
+        {
+            return "Strength";
+        }
+        else if (type == ExerciseType.Cardio)
+        {
+            return "Cardio";
+        }
+        else if (type == ExerciseType.Isometric)
+        {
+            return "Isometric";
+        }
+        else return null;
+    };
+
+    Func<Training, IEnumerable<ExerciseType>> DistinctedTags = training =>
+    {
+        return training.Exercises?.Select(e => e.Type).Distinct() ?? Enumerable.Empty<ExerciseType>();
+    };
+}
 
 <div class="container">
-    <div class="col-sm-10 gap-1 mx-auto d-flex flex-wrap">
-        @{
-            foreach (var training in Model)
+    <div class="col-sm-10 mx-auto">
+        <form asp-controller="Trainings" asp-action="Discover" method="get">
+            <div class="d-flex gap-1 col-sm-6 p-1">
+                <input class="form-control" type="text" name="search" placeholder="Training name" />
+                <input type="submit" value="Search" class="btn btn-outline-secondary" />
+            </div>
+        </form>
+
+        <div class="d-flex flex-wrap mt-2">
+            @foreach (var training in Model.Trainings)
             {
-                <div class="card p-3 col-sm-3 shadow">
-                    <h6>@training.Name</h6>
-                    <p class="text-muted">@(training.User != null ? training.User.UserName : "Author unknown")</p>
-                    <p class="text-muted">@training.Date</p>
-                    <p>@training.Description</p>
-                    <a type="button" asp-action="Details" asp-route-id="@training.Id">
-                        Show
-                    </a>
+                <div class="col-sm-3 p-1">
+                    <div class="card shadow py-1 px-3 d-flex flex-column justify-content-evenly" style="height: 220px">
+                        <div>
+                            <h5 class="discover-card-title">@training.Name</h5>
+                            <div class="mt-2">
+                                @foreach (var tag in DistinctedTags(training))
+                                {
+                                    <span class="exercise-type-tag">@ExerciseTypeTag(tag)</span>
+                                }
+                            </div>
+                            <h6 class="discover-card-subtitle text-muted mb-1">@training.User.UserName</h6>
+                            <h6 class="discover-card-subtitle text-muted">@training.Date</h6>
+                        </div>
+                        <p class="card-text">@training.Description</p>
+                        <a type="button" class="card-link" asp-action="Details" asp-route-id="@training.Id">Show</a>
+                    </div>
                 </div>
             }
-        }
+        </div>
     </div>
+
+    <nav>
+        <ul class="pagination">
+            @if (Model.Trainings.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-pageIndex="@(Model.Trainings.PageIndex - 1)" asp-route-search="@Model.SearchString">Previous</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            }
+
+            @for (int i = 1; i <= Model.Trainings.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Trainings.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-route-pageIndex="@i" asp-route-search="@Model.SearchString">@i</a>
+                </li>
+            }
+
+            @if (Model.Trainings.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-pageIndex="@(Model.Trainings.PageIndex + 1)" asp-route-search="@Model.SearchString">Next</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+            }
+        </ul>
+    </nav>
 </div>
