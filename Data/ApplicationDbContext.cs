@@ -10,9 +10,14 @@ namespace WorkoutTracker.Api.Data
             : base(options)
         {
         }
-        // Add DbSet properties for your entities here
-        // public DbSet<YourEntity> YourEntities { get; set; }
-    }
-    {
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
+
+        public DbSet<TrainingSession> TrainingSessions { get; set; }
+        public DbSet<TrainingExercise> TrainingExercises { get; set; }
+        public DbSet<TrainingSet> TrainingSets { get; set; }
     }
 }
