@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WorkoutTracker.Api.Data;
 using WorkoutTracker.Api.Models;
+using WorkoutTracker.Api.Services;
 
 namespace WorkoutTracker.Api
 {
@@ -57,15 +58,39 @@ namespace WorkoutTracker.Api
             });
 
             builder.Services.AddAuthorization();
-
             builder.Services.AddControllers();
-
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSwaggerGen(options => {
+                options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "WorkoutTracker API", Version = "v1" });
+                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    In = Microsoft.OpenApi.Models.ParameterLocation.Header, 
+                    Description = "Wprowadü token JWT poprzedzony s≥owem 'Bearer '. Przyk≥ad: 'Bearer 12345abcdef'",
+                    Name = "Authorization", 
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,                                                   
+                    Scheme = "Bearer" 
+                });
+                options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement 
+                {
+                    {
+                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                        {
+                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                            {
+                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                Id = "Bearer" 
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+            });
+
+            builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -73,12 +98,9 @@ namespace WorkoutTracker.Api
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
-
             app.Run();
         }
     }
