@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WorkoutTracker.Api.Data;
 using WorkoutTracker.Api.DTOs.Auth;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Services;
@@ -11,12 +14,16 @@ namespace WorkoutTracker.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ITokenService _tokenService; 
+        private readonly ITokenService _tokenService;
+        private readonly ApplicationDbContext _context;
 
-        public AuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService)
+        const int refreshTokenDurationDays = 7; // TODO: Move it to some config
+
+        public AuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService, ApplicationDbContext context)
         {
             _userManager = userManager;
             _tokenService = tokenService;
+            _context = context;
         }
 
 
@@ -33,7 +40,7 @@ namespace WorkoutTracker.Api.Controllers
                 UserName = model.Email,
                 DisplayName = model.DisplayName,
                 SecurityStamp = Guid.NewGuid().ToString(), // Ważne dla unieważniania tokenów przy zmianie hasła itp.
-            }; 
+            };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
@@ -54,10 +61,98 @@ namespace WorkoutTracker.Api.Controllers
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 var tokenInfo = _tokenService.GenerateToken(user);
-                return Ok(tokenInfo); 
+
+                var refreshTokenValue = _tokenService.GenerateRefreshToken();
+                var refreshTokenExpiry = DateTime.UtcNow.AddDays(refreshTokenDurationDays);
+
+                var refreshToken = new UserRefreshToken
+                {
+                    UserId = user.Id,
+                    Token = refreshTokenValue,
+                    ExpirationDate = refreshTokenExpiry,
+                    CreationDate = DateTime.UtcNow
+                };
+
+                await _context.RefreshTokens.AddAsync(refreshToken);
+                await _context.SaveChangesAsync();
+
+                return Ok(new LoginResponseDto
+                {
+                    Token = tokenInfo.Token,
+                    RefreshToken = refreshTokenValue,
+                    Expiration = tokenInfo.Expiration,
+                });
             }
 
             return Unauthorized(new { Status = "Error", Message = "Invalid email or password" });
+        }
+
+        [HttpPost("refresh)")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto model)
+        {
+            var storedToken = await _context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == model.RefreshToken);
+
+            if (storedToken == null)
+            {
+                return Unauthorized(new { Message = "Invalid refresh token" });
+            }
+
+            if (storedToken.ExpirationDate < DateTime.UtcNow)
+            {
+                _context.RefreshTokens.Remove(storedToken);
+                await _context.SaveChangesAsync();
+                return Unauthorized(new { Message = "Refresh token expired" });
+            }
+
+            if (storedToken.RevokedDate != null)
+            {
+                return Unauthorized(new { Message = "Refresh token revoked" });
+            }
+
+            var user = storedToken.User;
+
+            // Token is valid, but user dosen't exist, wierd situation 
+            if (user == null)
+            {
+                return BadRequest(new { Message = "User associated with token not found" });
+            }
+
+            var newTokenInfo = _tokenService.GenerateToken(user);
+
+            // Rotation of refresh token
+            var newRefreshTokenValue = _tokenService.GenerateRefreshToken();
+            var newRefreshTokenExpiry = DateTime.UtcNow.AddDays(refreshTokenDurationDays);
+
+            storedToken.Token = newRefreshTokenValue;
+            storedToken.ExpirationDate = newRefreshTokenExpiry;
+            storedToken.CreationDate = DateTime.UtcNow;
+
+            _context.RefreshTokens.Update(storedToken);
+            await _context.SaveChangesAsync();
+
+            return Ok(new LoginResponseDto
+            {
+                Token = newTokenInfo.Token,
+                Expiration = newTokenInfo.Expiration,
+                RefreshToken = newRefreshTokenValue,
+            });
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto model)
+        {
+            var storedToken = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == model.RefreshToken);
+            if (storedToken != null)
+            {
+                storedToken.RevokedDate = DateTime.UtcNow;
+                _context.RefreshTokens.Update(storedToken);
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new { Message = "Logout successful" });
         }
     }
 }
