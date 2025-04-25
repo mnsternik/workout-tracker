@@ -19,5 +19,6 @@ namespace WorkoutTracker.Api.Data
         public DbSet<TrainingSession> TrainingSessions { get; set; }
         public DbSet<TrainingExercise> TrainingExercises { get; set; }
         public DbSet<TrainingSet> TrainingSets { get; set; }
+        public DbSet<UserRefreshToken> RefreshTokens { get; set; }
     }
 }
