@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using WorkoutTracker.Api.DTOs.Auth;
 using WorkoutTracker.Api.Models;
@@ -9,7 +10,7 @@ namespace WorkoutTracker.Api.Services
 {
     public class JwtTokenService : ITokenService
     {
-        private readonly IConfiguration  _configuration;
+        private readonly IConfiguration _configuration;
 
         public JwtTokenService(IConfiguration configuration)
         {
@@ -27,7 +28,7 @@ namespace WorkoutTracker.Api.Services
 
             // TODO: Consider adding roles to the token claims
 
-            var jwtSettings = _configuration.GetSection("Jwt"); 
+            var jwtSettings = _configuration.GetSection("Jwt");
             var jwtAuthSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
             var tokenValidityInMinutes = int.Parse(jwtSettings["DurationInMinutes"] ?? "60");
 
@@ -49,6 +50,16 @@ namespace WorkoutTracker.Api.Services
                 Token = jwtToken,
                 Expiration = token.ValidTo
             };
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[64];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
         }
     }
 }

@@ -6,5 +6,6 @@ namespace WorkoutTracker.Api.Services
     public interface ITokenService
     {
         LoginResponseDto GenerateToken(ApplicationUser user);
+        string GenerateRefreshToken();
     }
 }
