@@ -62,6 +62,7 @@ namespace WorkoutTracker.Api.Controllers
             {
                 var tokenInfo = _tokenService.GenerateToken(user);
 
+                // Create and store refresh token
                 var refreshTokenValue = _tokenService.GenerateRefreshToken();
                 var refreshTokenExpiry = DateTime.UtcNow.AddDays(refreshTokenDurationDays);
 
