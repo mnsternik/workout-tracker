@@ -66,7 +66,7 @@ namespace WorkoutTracker.Api
                 options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
                 {
                     In = Microsoft.OpenApi.Models.ParameterLocation.Header, 
-                    Description = "Wprowadü token JWT poprzedzony s≥owem 'Bearer '. Przyk≥ad: 'Bearer 12345abcdef'",
+                    Description = "Enter JWT token with the word 'Bearer ' before. Example: 'Bearer 12345abcdef'",
                     Name = "Authorization", 
                     Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,                                                   
                     Scheme = "Bearer" 
