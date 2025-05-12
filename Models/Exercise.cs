@@ -6,9 +6,17 @@
         public string Name { get; set; } = string.Empty; 
         public string Description { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
+        public ExerciseType ExerciseType { get; set; }
         public MuscleGroup MuscleGroup { get; set; }
         public Equipment Equipment { get; set; }
         public DifficultyLevel DifficultyLevel { get; set; }
+    }
+
+    public enum ExerciseType
+    {
+        Strength,
+        Cardio,
+        Isometric
     }
 
     public enum MuscleGroup
