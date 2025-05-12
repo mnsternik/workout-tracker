@@ -32,14 +32,16 @@ namespace WorkoutTracker.Api.Controllers
         {
             var emailExists = await _userManager.FindByEmailAsync(model.Email);
             if (emailExists != null)
+            {
                 return StatusCode(StatusCodes.Status409Conflict, new { Status = "Error", Message = "Email already exists" });
+            }
 
             ApplicationUser user = new()
             {
                 Email = model.Email,
                 UserName = model.Email,
                 DisplayName = model.DisplayName,
-                SecurityStamp = Guid.NewGuid().ToString(), // Ważne dla unieważniania tokenów przy zmianie hasła itp.
+                SecurityStamp = Guid.NewGuid().ToString(), // Important for invalidating tokens when the password or other security-related data changes
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -60,12 +62,12 @@ namespace WorkoutTracker.Api.Controllers
 
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {
+                // Create token
                 var tokenInfo = _tokenService.GenerateToken(user);
 
-                // Create and store refresh token
+                // Create refresh token
                 var refreshTokenValue = _tokenService.GenerateRefreshToken();
                 var refreshTokenExpiry = DateTime.UtcNow.AddDays(refreshTokenDurationDays);
-
                 var refreshToken = new UserRefreshToken
                 {
                     UserId = user.Id,
@@ -74,6 +76,7 @@ namespace WorkoutTracker.Api.Controllers
                     CreationDate = DateTime.UtcNow
                 };
 
+                // Store refresh token
                 await _context.RefreshTokens.AddAsync(refreshToken);
                 await _context.SaveChangesAsync();
 
@@ -91,6 +94,7 @@ namespace WorkoutTracker.Api.Controllers
         [HttpPost("refresh)")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto model)
         {
+            // Find and validate token
             var storedToken = await _context.RefreshTokens
                 .Include(rt => rt.User)
                 .FirstOrDefaultAsync(rt => rt.Token == model.RefreshToken);
@@ -112,6 +116,7 @@ namespace WorkoutTracker.Api.Controllers
                 return Unauthorized(new { Message = "Refresh token revoked" });
             }
 
+            // Token is valid
             var user = storedToken.User;
 
             // Token is valid, but user dosen't exist, wierd situation 
@@ -120,12 +125,14 @@ namespace WorkoutTracker.Api.Controllers
                 return BadRequest(new { Message = "User associated with token not found" });
             }
 
+            // Generete new token
             var newTokenInfo = _tokenService.GenerateToken(user);
 
             // Rotation of refresh token
             var newRefreshTokenValue = _tokenService.GenerateRefreshToken();
             var newRefreshTokenExpiry = DateTime.UtcNow.AddDays(refreshTokenDurationDays);
 
+            // Update refresh token
             storedToken.Token = newRefreshTokenValue;
             storedToken.ExpirationDate = newRefreshTokenExpiry;
             storedToken.CreationDate = DateTime.UtcNow;
