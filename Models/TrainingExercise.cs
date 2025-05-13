@@ -17,6 +17,6 @@ namespace WorkoutTracker.Api.Models
         [ForeignKey(nameof(ExerciseId))]
         public Exercise Exercise { get; set; } = null!;
 
-        public List<TrainingSet> Sets { get; set; } = [];
+        public ICollection<TrainingSet> Sets { get; set; } = [];
     }
 }
