@@ -22,6 +22,6 @@ namespace WorkoutTracker.Api.Models
         public bool IsActive => RevokedDate == null && ExpirationDate > DateTime.UtcNow;
 
         [ForeignKey(nameof(UserId))]
-        public virtual ApplicationUser? User { get; set; } = null!;
+        public ApplicationUser? User { get; set; } = null!;
     }
 }
