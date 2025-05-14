@@ -1,0 +1,29 @@
+﻿using System.ComponentModel.DataAnnotations;
+using WorkoutTracker.Api.Models;
+
+namespace WorkoutTracker.Api.DTOs.Exercise
+{
+    public record ExerciseCreateDto
+    {
+        [Required]
+        public string Name { get; init; } = string.Empty;
+
+        [Required]
+        public string Description { get; init; } = string.Empty;
+
+        [Url]
+        public string? ImageUrl { get; init; }
+
+        [Required]
+        public ExerciseType ExerciseType { get; init; }
+
+        [MinLength(1)]
+        public IList<MuscleGroup> MuscleGroups { get; init; } = new List<MuscleGroup>();
+
+        [Required]
+        public Equipment Equipment { get; init; }
+
+        [Required]
+        public DifficultyLevel DifficultyLevel { get; init; }
+    }
+}
