@@ -41,9 +41,14 @@ namespace WorkoutTracker.Api
             })
             .AddJwtBearer(options =>
             {
+                var jwtKey = builder.Configuration["Jwt:Key"];
+                if (string.IsNullOrWhiteSpace(jwtKey))
+                {
+                    throw new InvalidOperationException("JWT key is missing in configuration. Set 'Jwt:Key' in appsettings or environment variables.");
+                }
+
                 options.SaveToken = true; 
                 options.RequireHttpsMetadata = false; // dev = false, prod = true
-
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuer = true, 
@@ -53,7 +58,7 @@ namespace WorkoutTracker.Api
 
                     ValidIssuer = builder.Configuration["Jwt:Issuer"], 
                     ValidAudience = builder.Configuration["Jwt:Audience"], 
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) 
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)) 
                 };
             });
 
