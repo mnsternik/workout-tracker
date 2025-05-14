@@ -1,28 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace WorkoutTracker.Api.Models
+﻿namespace WorkoutTracker.Api.Models
 {
     public class Exercise
     {
         public int Id { get; set; }
-
-        [Required]
         public string Name { get; set; } = string.Empty;
-
-        [Required]
         public string Description { get; set; } = string.Empty;
         public string? ImageUrl { get; set; }
-
-        [Required]
         public ExerciseType ExerciseType { get; set; }
-
-        [Required]
-        public ICollection<MuscleGroup> MuscleGroup { get; set; } = [];
-
-        [Required]
+        public ICollection<MuscleGroup> MuscleGroups { get; set; } = new List<MuscleGroup>();
         public Equipment Equipment { get; set; }
-
-        [Required]
         public DifficultyLevel DifficultyLevel { get; set; }
     }
 
