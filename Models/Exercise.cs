@@ -7,7 +7,7 @@
         public string Description { get; set; } = string.Empty;
         public string? ImageUrl { get; set; }
         public ExerciseType ExerciseType { get; set; }
-        public ICollection<MuscleGroup> MuscleGroups { get; set; } = new List<MuscleGroup>();
+        public ICollection<ExerciseMuscleGroupLink> MuscleGroupsLinks { get; set; } = new List<ExerciseMuscleGroupLink>();
         public Equipment Equipment { get; set; }
         public DifficultyLevel DifficultyLevel { get; set; }
     }
