@@ -11,15 +11,28 @@ namespace WorkoutTracker.Api.Data
         {
         }
 
+        public DbSet<TrainingSession> TrainingSessions { get; set; }
+        public DbSet<TrainingExercise> TrainingExercises { get; set; }
+        public DbSet<TrainingSet> TrainingSets { get; set; }
+        public DbSet<Exercise> Exercises { get; set; }
+        public DbSet<ExerciseMuscleGroupLink> ExerciseMuscleGroupLinks { get; set; }
+        public DbSet<UserRefreshToken> RefreshTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<TrainingSession>(entity =>
             {
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Notes).HasMaxLength(1000);
-                entity.Property(e => e.UserId).IsRequired();
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Notes)
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.UserId)
+                    .IsRequired();
 
                 entity.HasMany(e => e.Exercises)
                     .WithOne(e => e.TrainingSession)
@@ -29,28 +42,35 @@ namespace WorkoutTracker.Api.Data
 
             modelBuilder.Entity<TrainingExercise>(entity =>
             {
-                entity.Property(e => e.OrderInSession).IsRequired();
+                entity.Property(e => e.OrderInSession)
+                    .IsRequired();
 
                 entity.HasOne(e => e.Exercise)
-                  .WithMany()
-                  .HasForeignKey(e => e.ExerciseId);
+                    .WithMany()
+                    .HasForeignKey(e => e.ExerciseId);
 
                 entity.HasMany(e => e.Sets)
-                  .WithOne(s => s.TrainingExercise)
-                  .HasForeignKey(s => s.TrainingExerciseId)
-                  .OnDelete(DeleteBehavior.Cascade); 
+                    .WithOne(s => s.TrainingExercise)
+                    .HasForeignKey(s => s.TrainingExerciseId)
+                    .OnDelete(DeleteBehavior.Cascade); 
             });
 
             modelBuilder.Entity<TrainingSet>(entity =>
             {
-                entity.Property(e => e.OrderInExercise).IsRequired();
-                entity.Property(e => e.WeightKg).HasColumnType("decimal(6,2)");
+                entity.Property(e => e.OrderInExercise)
+                    .IsRequired();
+
+                entity.Property(e => e.WeightKg)
+                    .HasColumnType("decimal(6,2)");
             });
 
             modelBuilder.Entity<Exercise>(entity =>
             {
-                entity.Property(e => e.Name).IsRequired();
-                entity.Property(e => e.Description).IsRequired();
+                entity.Property(e => e.Name)
+                    .IsRequired();
+
+                entity.Property(e => e.Description)
+                    .IsRequired();
 
                 entity.Property(e => e.ExerciseType)
                       .HasConversion<string>(); 
@@ -61,16 +81,20 @@ namespace WorkoutTracker.Api.Data
                 entity.Property(e => e.DifficultyLevel)
                       .HasConversion<string>();
 
-                // TODO: Fix it
-                //entity.HasMany(e => e.MuscleGroups) 
-                //      .WithMany();
+            });
+
+            modelBuilder.Entity<ExerciseMuscleGroupLink>(entity =>
+            {
+                // Composite primary key
+                entity.HasKey(e => new { e.ExerciseId, e.MuscleGroup });
+
+                entity.HasOne(e => e.Exercise)
+                    .WithMany(e => e.MuscleGroupsLinks)
+                    .HasForeignKey(e => e.ExerciseId);
+
+                entity.Property(e => e.MuscleGroup)
+                    .HasConversion<string>();
             });
         }
-
-        public DbSet<TrainingSession> TrainingSessions { get; set; }
-        public DbSet<TrainingExercise> TrainingExercises { get; set; }
-        public DbSet<TrainingSet> TrainingSets { get; set; }
-        public DbSet<Exercise> Exercises { get; set; }
-        public DbSet<UserRefreshToken> RefreshTokens { get; set; }
     }
 }
