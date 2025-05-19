@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WorkoutTracker.Api.Data;
+using WorkoutTracker.Api.Mapping;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Services;
 
@@ -61,6 +62,8 @@ namespace WorkoutTracker.Api
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)) 
                 };
             });
+
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             builder.Services.AddAuthorization();
             builder.Services.AddControllers();
