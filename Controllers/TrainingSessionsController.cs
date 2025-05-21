@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Api.Data;
+using WorkoutTracker.Api.DTOs.Training.TrainingSession;
 using WorkoutTracker.Api.Models;
+using WorkoutTracker.Api.Utilities;
 
 namespace WorkoutTracker.Api.Controllers
 {
@@ -15,18 +14,32 @@ namespace WorkoutTracker.Api.Controllers
     public class TrainingSessionsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public TrainingSessionsController(ApplicationDbContext context)
+        public TrainingSessionsController(ApplicationDbContext context, IMapper mapper)
         {
+            _mapper = mapper;
             _context = context;
         }
 
         // GET: api/TrainingSessions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TrainingSession>>> GetTrainingSessions()
+        public async Task<ActionResult<PaginatedList<TrainingSessionReadDto>>> GetTrainingSessions(int pageIndex = 1, int pageSize = 10)
         {
-            return await _context.TrainingSessions.ToListAsync();
+            var query = _context.TrainingSessions
+                .Include(t => t.Exercises)
+                .ThenInclude(te => te.Sets)
+                .AsNoTracking();
+                
+            var dtoQuery = query.ProjectTo<TrainingSessionReadDto>(_mapper.ConfigurationProvider);  
+                
+            // Apply filtering or sorting 
+
+            var paginatedList = await PaginatedList<TrainingSessionReadDto>.CreateAsync(dtoQuery, pageIndex, pageSize);
+
+            return Ok(paginatedList);
         }
+
 
         // GET: api/TrainingSessions/5
         [HttpGet("{id}")]
