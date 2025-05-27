@@ -12,39 +12,35 @@ namespace WorkoutTracker.Api.Mapping
     {
         public MappingProfile() 
         {
-            // --- Authentication Mappings ---
+            // Authentication 
             CreateMap<RegisterDto, ApplicationUser>()
                     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email)) // Email is used as UserName for Identity
                     .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.DisplayName));
 
-            // --- Exercise Mappings (Predefined Exercises) ---
+            // Predefined Exercises
             CreateMap<ExerciseCreateDto, Exercise>()
                 .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.Ignore()); // MuscleGroupsLinks are handled separately after mapping
 
             CreateMap<Exercise, ExerciseReadDto>()
                     .ForMember(dest => dest.MuscleGroups, opt => opt.MapFrom(src => src.MuscleGroupsLinks.Select(link => link.MuscleGroup).ToList()));
 
-            // --- Training Set Mappings ---
+            // Training session's Sets
             CreateMap<TrainingSetCreateDto, TrainingSet>(); 
             CreateMap<TrainingSet, TrainingSetReadDto>(); 
 
-            // --- Training Exercise Mappings ---
+            // Training sessions's Exercises
             CreateMap<TrainingExerciseCreateDto, TrainingExercise>()
                 .ForMember(dest => dest.Sets, opt => opt.MapFrom(src => src.Sets));
 
             CreateMap<TrainingExercise, TrainingExerciseReadDto>()
                 .ForMember(dest => dest.Sets, opt => opt.MapFrom(src => src.Sets)); 
 
-            // --- Training Session Mappings ---
+            // Training sessions
             CreateMap<TrainingSessionCreateDto, TrainingSession>()
                 .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises));
 
             CreateMap<TrainingSession, TrainingSessionReadDto>()
-                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises)) 
-                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id)); // Assuming User navigation property is loaded
-
-            // TODO: Create a list of training sessions
-
+                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises));
         }
     }
 }

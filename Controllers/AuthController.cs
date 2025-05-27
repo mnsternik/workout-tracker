@@ -91,7 +91,7 @@ namespace WorkoutTracker.Api.Controllers
             return Unauthorized(new { Status = "Error", Message = "Invalid email or password" });
         }
 
-        [HttpPost("refresh)")]
+        [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto model)
         {
             // Find and validate token
