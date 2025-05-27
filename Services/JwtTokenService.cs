@@ -22,14 +22,14 @@ namespace WorkoutTracker.Api.Services
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             // TODO: Consider adding roles to the token claims
 
             var jwtSettings = _configuration.GetSection("Jwt");
-            var jwtAuthSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+            var jwtAuthSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
             var tokenValidityInMinutes = int.Parse(jwtSettings["DurationInMinutes"] ?? "60");
 
             var tokenDescriptor = new SecurityTokenDescriptor
