@@ -1,5 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Api.Data;
@@ -43,16 +45,21 @@ namespace WorkoutTracker.Api.Controllers
 
         // GET: api/TrainingSessions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TrainingSession>> GetTrainingSession(int id)
+        public async Task<ActionResult<TrainingSessionReadDto>> GetTrainingSession(int id)
         {
-            var trainingSession = await _context.TrainingSessions.FindAsync(id);
+            var trainingSession = await _context.TrainingSessions
+                .Include(t => t.Exercises)
+                .ThenInclude(te => te.Sets)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (trainingSession == null)
             {
                 return NotFound();
             }
 
-            return trainingSession;
+            var trainingSessionDto = _mapper.Map<TrainingSessionReadDto>(trainingSession);
+
+            return trainingSessionDto;
         }
 
         // PUT: api/TrainingSessions/5
@@ -86,16 +93,30 @@ namespace WorkoutTracker.Api.Controllers
         }
 
         // POST: api/TrainingSessions
+        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<TrainingSession>> PostTrainingSession(TrainingSession trainingSession)
+        public async Task<ActionResult<TrainingSession>> PostTrainingSession(TrainingSessionCreateDto trainingSessionDto)
         {
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID not found in token");
+            }
+
+            var trainingSession = _mapper.Map<TrainingSession>(trainingSessionDto);
+            trainingSession.UserId = userId; 
+
             _context.TrainingSessions.Add(trainingSession);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTrainingSession), new { id = trainingSession.Id }, trainingSession);
+            var createdSessionDto = _mapper.Map<TrainingSessionReadDto>(trainingSession);
+
+            return CreatedAtAction(nameof(GetTrainingSession), new { id = createdSessionDto.Id }, createdSessionDto);
         }
 
         // DELETE: api/TrainingSessions/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrainingSession(int id)
         {
