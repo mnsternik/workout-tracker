@@ -84,14 +84,33 @@ namespace WorkoutTracker.Api.Controllers
                         lowerMuscleGroups.Contains(mgl.MuscleGroup.ToString().ToLower()))));
             }
 
-            // TODO: Sorting
-
-
-
+            // Sorting
+            if (!string.IsNullOrEmpty(queryParams.SortBy))
+            {
+                bool isDescending = queryParams.SortOrder?.ToLower() == "desc";
+                switch (queryParams.SortBy)
+                {
+                    case "name":
+                        query = isDescending ? query.OrderByDescending(t => t.Name) : query.OrderBy(t => t.Name);
+                        break;
+                    case "createdat":
+                        query = isDescending ? query.OrderByDescending(t => t.CreatedAt) : query.OrderBy(t => t.CreatedAt);
+                        break;
+                    case "duration":
+                        query = isDescending ? query.OrderByDescending(t => t.DurationMinutes) : query.OrderBy(t => t.DurationMinutes);
+                        break;
+                    case "difficulty":
+                        query = isDescending ? query.OrderByDescending(t => t.DifficultyRating) : query.OrderBy(t => t.DifficultyRating);
+                        break;
+                    default:
+                        query = isDescending ? query.OrderByDescending(t => t.CreatedAt) : query.OrderBy(t => t.CreatedAt);
+                        break; 
+                }
+            }
 
             var dtoQuery = query.ProjectTo<TrainingSessionReadDto>(_mapper.ConfigurationProvider);  
 
-            var paginatedList = await PaginatedList<TrainingSessionReadDto>.CreateAsync(dtoQuery, pageIndex, pageSize);
+            var paginatedList = await PaginatedList<TrainingSessionReadDto>.CreateAsync(dtoQuery, queryParams.PageNumber, queryParams.PageSize);
 
             return Ok(paginatedList);
         }
@@ -102,8 +121,12 @@ namespace WorkoutTracker.Api.Controllers
         public async Task<ActionResult<TrainingSessionReadDto>> GetTrainingSession(int id)
         {
             var trainingSession = await _context.TrainingSessions
+                .Include(t => t.User)
                 .Include(t => t.Exercises)
-                .ThenInclude(te => te.Sets)
+                    .ThenInclude(te => te.Exercise)
+                        .ThenInclude(e => e.MuscleGroupsLinks)
+                .Include(t => t.Exercises)
+                    .ThenInclude(te => te.Sets)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (trainingSession == null)
@@ -117,15 +140,45 @@ namespace WorkoutTracker.Api.Controllers
         }
 
         // PUT: api/TrainingSessions/5
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTrainingSession(int id, TrainingSession trainingSession)
+        public async Task<IActionResult> PutTrainingSession(int id, [FromBody] TrainingSessionUpdateDto trainingSessionDto)
         {
-            if (id != trainingSession.Id)
+            var sessionToUpdate = await _context.TrainingSessions
+                .Include(t => t.Exercises)
+                    .ThenInclude(te => te.Sets)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (sessionToUpdate == null)
             {
-                return BadRequest();
+                return BadRequest($"Training session with Id {id} not found"); 
             }
 
-            _context.Entry(trainingSession).State = EntityState.Modified;
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserId != sessionToUpdate.UserId)
+            {
+                return Forbid("You are not authorized to update this training session.");
+            }
+
+            // Update basic properties
+            sessionToUpdate.Name = trainingSessionDto.Name;
+            sessionToUpdate.Notes = trainingSessionDto.Notes;
+            sessionToUpdate.DurationMinutes = trainingSessionDto.EstimatedDurationMinutes;
+            sessionToUpdate.DifficultyRating = trainingSessionDto.DifficultyRating;
+
+            // Clear existing exercises and sets
+            _context.TrainingSets.RemoveRange(sessionToUpdate.Exercises.SelectMany(e => e.Sets));
+            _context.TrainingExercises.RemoveRange(sessionToUpdate.Exercises);
+            sessionToUpdate.Exercises.Clear();
+
+            // Add new exercises and their sets
+            foreach (var exerciseDto in trainingSessionDto.Exercises)
+            {
+                var exercise = _mapper.Map<TrainingExercise>(exerciseDto);
+                exercise.TrainingSessionId = id;
+
+                sessionToUpdate.Exercises.Add(exercise);
+            }
 
             try
             {
@@ -139,7 +192,7 @@ namespace WorkoutTracker.Api.Controllers
                 }
                 else
                 {
-                    throw;
+                    return Conflict(new { message = "The training session was updated by another process. Please reload and try again." });
                 }
             }
 
@@ -152,14 +205,14 @@ namespace WorkoutTracker.Api.Controllers
         public async Task<ActionResult<TrainingSession>> PostTrainingSession(TrainingSessionCreateDto trainingSessionDto)
         {
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(currentUserId))
             {
                 return BadRequest("User ID not found in token");
             }
 
             var trainingSession = _mapper.Map<TrainingSession>(trainingSessionDto);
-            trainingSession.UserId = userId; 
+            trainingSession.UserId = currentUserId; 
 
             _context.TrainingSessions.Add(trainingSession);
             await _context.SaveChangesAsync();
