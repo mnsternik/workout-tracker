@@ -4,6 +4,7 @@ using WorkoutTracker.Api.DTOs.Exercise;
 using WorkoutTracker.Api.DTOs.Training.Exercise;
 using WorkoutTracker.Api.DTOs.Training.Set;
 using WorkoutTracker.Api.DTOs.Training.TrainingSession;
+using WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession;
 using WorkoutTracker.Api.Models;
 
 namespace WorkoutTracker.Api.Mapping
@@ -40,6 +41,9 @@ namespace WorkoutTracker.Api.Mapping
                 .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises));
 
             CreateMap<TrainingSession, TrainingSessionReadDto>()
+                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises));
+
+            CreateMap<TrainingSessionUpdateDto, TrainingSession>()
                 .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises));
         }
     }
