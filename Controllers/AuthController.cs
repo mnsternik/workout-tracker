@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Api.Data;
 using WorkoutTracker.Api.DTOs.Auth;
 using WorkoutTracker.Api.Models;
-using WorkoutTracker.Api.Services;
+using WorkoutTracker.Api.Services.Auth;
 
 namespace WorkoutTracker.Api.Controllers
 {
