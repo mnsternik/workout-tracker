@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Api.Data;
 using WorkoutTracker.Api.DTOs.Training.TrainingSession;
 using WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession;
+using WorkoutTracker.Api.Exceptions;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Utilities;
 
@@ -42,6 +43,108 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             // Return paginated DTOs list
             return await PaginatedList<TrainingSessionReadDto>.CreateAsync(dtoQuery, queryParams.PageNumber, queryParams.PageSize);
         }
+
+        public async Task<TrainingSessionReadDto?> GetTrainingSessionAsync(int id)
+        {
+            var trainingSession = await _context.TrainingSessions
+                .Include(t => t.User)
+                .Include(t => t.Exercises)
+                    .ThenInclude(te => te.Exercise)
+                        .ThenInclude(e => e.MuscleGroupsLinks)
+                .Include(t => t.Exercises)
+                    .ThenInclude(te => te.Sets)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (trainingSession == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<TrainingSessionReadDto>(trainingSession);
+        }
+
+        public async Task UpdateTrainingSessionAsync(int sessionId, string currentUserId, TrainingSessionUpdateDto trainingSessionDto)
+        {
+            var sessionToUpdate = await _context.TrainingSessions
+                .Include(t => t.Exercises)
+                    .ThenInclude(te => te.Sets)
+                .FirstOrDefaultAsync(t => t.Id == sessionId);
+
+            if (sessionToUpdate == null)
+            {
+                throw new EntityNotFoundException($"Training session with Id {sessionId} not found");
+            }
+            if (currentUserId != sessionToUpdate.UserId)
+            {
+                throw new UnauthorizedActionException("You are not authorized to update this training session.");
+            }
+
+            // Update basic properties
+            sessionToUpdate.Name = trainingSessionDto.Name;
+            sessionToUpdate.Notes = trainingSessionDto.Notes;
+            sessionToUpdate.DurationMinutes = trainingSessionDto.EstimatedDurationMinutes;
+            sessionToUpdate.DifficultyRating = trainingSessionDto.DifficultyRating;
+
+            // Clear existing exercises and sets
+            _context.TrainingSets.RemoveRange(sessionToUpdate.Exercises.SelectMany(e => e.Sets));
+            _context.TrainingExercises.RemoveRange(sessionToUpdate.Exercises);
+            sessionToUpdate.Exercises.Clear();
+
+            // Add new exercises and their sets
+            foreach (var exerciseDto in trainingSessionDto.Exercises)
+            {
+                var exercise = _mapper.Map<TrainingExercise>(exerciseDto);
+                exercise.TrainingSessionId = sessionId;
+
+                sessionToUpdate.Exercises.Add(exercise);
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TrainingSessionExists(sessionId))
+                {
+                    throw new EntityNotFoundException($"Training session with Id {sessionId} was deleted");
+                }
+                else
+                {
+                    throw new DbUpdateConcurrencyException($"The training session with Id {sessionId} was updated by another process. Please reload and try again.");
+                }
+            }
+        }
+
+        public async Task<TrainingSessionReadDto> PostTrainingSessionAsync(string currentUserId, TrainingSessionCreateDto trainingSessionDto)
+        {
+            var trainingSession = _mapper.Map<TrainingSession>(trainingSessionDto);
+            trainingSession.UserId = currentUserId;
+
+            _context.TrainingSessions.Add(trainingSession);
+            await _context.SaveChangesAsync();
+
+            // Return created entity's DTO
+            return _mapper.Map<TrainingSessionReadDto>(trainingSession);
+        }
+
+        public async Task DeleteTrainingSession(int sessionId, string currentUserId)
+        {
+            var trainingSession = await _context.TrainingSessions.FindAsync(sessionId);
+
+            if (trainingSession == null)
+            {
+                throw new EntityNotFoundException($"Training session with Id {sessionId} not found");
+            }
+            if (trainingSession.UserId != currentUserId)
+            {
+                throw new UnauthorizedActionException("You are not authorized to delete this training session.");
+            }
+
+            _context.TrainingSessions.Remove(trainingSession);
+            await _context.SaveChangesAsync();
+        }
+
 
         private IQueryable<TrainingSession> FilterTrainingSessions(IQueryable<TrainingSession> query, TrainingSessionQueryParameters queryParams)
         {
@@ -111,6 +214,11 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             }
 
             return query; 
+        }
+
+        private bool TrainingSessionExists(int id)
+        {
+            return _context.TrainingSessions.Any(e => e.Id == id);
         }
     }
 }
