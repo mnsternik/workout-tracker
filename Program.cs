@@ -7,6 +7,7 @@ using WorkoutTracker.Api.Data;
 using WorkoutTracker.Api.Mapping;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Services;
+using WorkoutTracker.Api.Services.Auth;
 
 namespace WorkoutTracker.Api
 {
