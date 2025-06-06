@@ -1,7 +1,7 @@
 ﻿namespace WorkoutTracker.Api.Exceptions
 {
-    public class UnauthorizedAccessException : Exception
+    public class UnauthorizedActionException : Exception
     {
-        public UnauthorizedAccessException(string message) : base(message) { }
+        public UnauthorizedActionException(string message) : base(message) { }
     }
 }
