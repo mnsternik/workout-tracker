@@ -22,8 +22,18 @@ namespace WorkoutTracker.Api.Mapping
             CreateMap<ExerciseCreateDto, Exercise>()
                 .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.Ignore()); // MuscleGroupsLinks are handled separately after mapping
 
+            CreateMap<ExerciseUpdateDto, Exercise>()
+                //.ForMember(dest => dest.MuscleGroupsLinks,
+                //    opt => opt.MapFrom(src => src.MuscleGroups)); ;
+                .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.Ignore());
+
             CreateMap<Exercise, ExerciseReadDto>()
-                    .ForMember(dest => dest.MuscleGroups, opt => opt.MapFrom(src => src.MuscleGroupsLinks.Select(link => link.MuscleGroup).ToList()));
+                .ForMember(dest => dest.MuscleGroups,
+                    opt => opt.MapFrom(src => src.MuscleGroupsLinks));
+
+            // ExerciseMuscleGroupLink
+            CreateMap<ExerciseMuscleGroupLink, ExerciseMuscleGroupLinkDto>();
+            CreateMap<ExerciseMuscleGroupLinkDto, ExerciseMuscleGroupLink>();
 
             // Training session's Sets
             CreateMap<TrainingSetCreateDto, TrainingSet>(); 
