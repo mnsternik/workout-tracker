@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WorkoutTracker.Api.Data;
+using WorkoutTracker.Api.Filters;
 using WorkoutTracker.Api.Mapping;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Services.Auth;
@@ -68,7 +69,10 @@ namespace WorkoutTracker.Api
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             builder.Services.AddAuthorization();
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<ExceptionFilter>();
+            });
             builder.Services.AddEndpointsApiExplorer();
 
             builder.Services.AddSwaggerGen(options => {
