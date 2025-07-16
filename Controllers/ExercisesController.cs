@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WorkoutTracker.Api.DTOs.Exercise;
-using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Services.Exercises;
 
 namespace WorkoutTracker.Api.Controllers
@@ -13,7 +12,6 @@ namespace WorkoutTracker.Api.Controllers
 
         public ExercisesController(IExerciseService exerciseService)
         {
-
             _exerciseService = exerciseService;
         }
 
@@ -29,7 +27,6 @@ namespace WorkoutTracker.Api.Controllers
         public async Task<ActionResult<ExerciseReadDto>> GetExercise(int id)
         {
             var exerciseDto = await _exerciseService.GetExerciseAsync(id);      
-            // TODO: Add global exception handling and return NotFound when EntityNotFoundException occur in exerciseService
             return Ok(exerciseDto);
         }
 
@@ -43,7 +40,7 @@ namespace WorkoutTracker.Api.Controllers
 
         // POST: api/Exercises
         [HttpPost]
-        public async Task<ActionResult<Exercise>> PostExercise(ExerciseCreateDto exerciseDto)
+        public async Task<ActionResult<ExerciseReadDto>> PostExercise(ExerciseCreateDto exerciseDto)
         {
             var exercise = await _exerciseService.PostExerciseAsync(exerciseDto);
             return CreatedAtAction(nameof(GetExercise), new { id = exercise.Id }, exercise);
