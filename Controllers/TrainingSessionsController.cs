@@ -44,7 +44,7 @@ namespace WorkoutTracker.Api.Controllers
                 return NotFound();
             }
 
-            return trainingSession;
+            return Ok(trainingSession);
         }
 
         // PUT: api/TrainingSessions/5
