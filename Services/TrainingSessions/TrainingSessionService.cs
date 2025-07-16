@@ -57,22 +57,27 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
 
             if (trainingSession == null)
             {
-                return null;
+                throw new EntityNotFoundException($"Training session with Id {id} not found");
             }
 
             return _mapper.Map<TrainingSessionReadDto>(trainingSession);
         }
 
-        public async Task UpdateTrainingSessionAsync(int sessionId, string currentUserId, TrainingSessionUpdateDto trainingSessionDto)
+        public async Task UpdateTrainingSessionAsync(int id, string? currentUserId, TrainingSessionUpdateDto trainingSessionDto)
         {
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token");
+            }
+
             var sessionToUpdate = await _context.TrainingSessions
                 .Include(t => t.Exercises)
                     .ThenInclude(te => te.Sets)
-                .FirstOrDefaultAsync(t => t.Id == sessionId);
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (sessionToUpdate == null)
             {
-                throw new EntityNotFoundException($"Training session with Id {sessionId} not found");
+                throw new EntityNotFoundException($"Training session with Id {id} not found");
             }
             if (currentUserId != sessionToUpdate.UserId)
             {
@@ -94,7 +99,7 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             foreach (var exerciseDto in trainingSessionDto.Exercises)
             {
                 var exercise = _mapper.Map<TrainingExercise>(exerciseDto);
-                exercise.TrainingSessionId = sessionId;
+                exercise.TrainingSessionId = id;
 
                 sessionToUpdate.Exercises.Add(exercise);
             }
@@ -105,19 +110,24 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TrainingSessionExists(sessionId))
+                if (!TrainingSessionExists(id))
                 {
-                    throw new EntityNotFoundException($"Training session with Id {sessionId} was deleted");
+                    throw new EntityNotFoundException($"Training session with Id {id} was deleted");
                 }
                 else
                 {
-                    throw new DbUpdateConcurrencyException($"The training session with Id {sessionId} was updated by another process. Please reload and try again.");
+                    throw new DbUpdateConcurrencyException($"The training session with Id {id} was updated by another process. Please reload and try again.");
                 }
             }
         }
 
-        public async Task<TrainingSessionReadDto> PostTrainingSessionAsync(string currentUserId, TrainingSessionCreateDto trainingSessionDto)
+        public async Task<TrainingSessionReadDto> PostTrainingSessionAsync(string? currentUserId, TrainingSessionCreateDto trainingSessionDto)
         {
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token");
+            }
+
             var trainingSession = _mapper.Map<TrainingSession>(trainingSessionDto);
             trainingSession.UserId = currentUserId;
 
@@ -128,8 +138,13 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             return _mapper.Map<TrainingSessionReadDto>(trainingSession);
         }
 
-        public async Task DeleteTrainingSession(int sessionId, string currentUserId)
+        public async Task DeleteTrainingSession(int sessionId, string? currentUserId)
         {
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token");
+            }
+
             var trainingSession = await _context.TrainingSessions.FindAsync(sessionId);
 
             if (trainingSession == null)
