@@ -67,7 +67,7 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
         {
             if (string.IsNullOrEmpty(currentUserId))
             {
-                throw new UnauthorizedAccessException("User ID not found in token");
+                throw new UnauthorizedActionException("User ID not found in token");
             }
 
             var sessionToUpdate = await _context.TrainingSessions
@@ -81,7 +81,7 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             }
             if (currentUserId != sessionToUpdate.UserId)
             {
-                throw new UnauthorizedActionException("You are not authorized to update this training session.");
+                throw new UnauthorizedActionException("You are not authorized to update another user training session.");
             }
 
             // Update basic properties
@@ -125,7 +125,7 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
         {
             if (string.IsNullOrEmpty(currentUserId))
             {
-                throw new UnauthorizedAccessException("User ID not found in token");
+                throw new UnauthorizedActionException("User ID not found in token");
             }
 
             var trainingSession = _mapper.Map<TrainingSession>(trainingSessionDto);
@@ -142,7 +142,7 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
         {
             if (string.IsNullOrEmpty(currentUserId))
             {
-                throw new UnauthorizedAccessException("User ID not found in token");
+                throw new UnauthorizedActionException("User ID not found in token");
             }
 
             var trainingSession = await _context.TrainingSessions.FindAsync(sessionId);
