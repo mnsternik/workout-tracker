@@ -23,19 +23,25 @@ namespace WorkoutTracker.Api.Filters
 
             switch (context.Exception)
             {
-                case EntityNotFoundException entityNotFoundException:
+                case EntityNotFoundException ex:
                     statusCode = HttpStatusCode.NotFound;
-                    message = entityNotFoundException.Message;
+                    message = ex.Message;
                     break;
 
-                case UnauthorizedAccessException unauthorizedAccessException:
+                case UnauthorizedActionException ex:
                     statusCode = HttpStatusCode.Unauthorized;
-                    message = unauthorizedAccessException.Message;
+                    message = ex.Message;
                     break;
 
-                case DbUpdateConcurrencyException dbUpdateConcurrencyException:
+                case Exception ex
+                    when ex is DbUpdateConcurrencyException or EntityAlreadyExistsException:
                     statusCode = HttpStatusCode.Conflict;
-                    message = dbUpdateConcurrencyException.Message;
+                    message = ex.Message;
+                    break;
+
+                case CreateUserAccountException ex:
+                    statusCode = HttpStatusCode.BadRequest;
+                    message = ex.Message;
                     break;
 
                 default:
