@@ -101,9 +101,10 @@ namespace WorkoutTracker.Api
                 });
             });
 
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITokenService, JwtTokenService>();
-            builder.Services.AddTransient<ITrainingSessionsService, TrainingSessionService>();
-            builder.Services.AddTransient<IExerciseService, ExerciseService>();
+            builder.Services.AddScoped<ITrainingSessionsService, TrainingSessionService>();
+            builder.Services.AddScoped<IExerciseService, ExerciseService>();
 
             var app = builder.Build();
 
