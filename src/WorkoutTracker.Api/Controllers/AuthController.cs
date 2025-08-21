@@ -33,8 +33,8 @@ namespace WorkoutTracker.Api.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto tokenDto)
         {
-           var loginResponseDto = await _authService.RefreshTokenAsync(tokenDto);
-            return Ok(loginResponseDto);
+           var loginResponseDto = await _authService.RefreshTokenAsync(tokenDto); 
+           return Ok(loginResponseDto);
         }
 
         [Authorize]

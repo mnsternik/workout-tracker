@@ -13,7 +13,6 @@ namespace WorkoutTracker.Api.Controllers
     [ApiController]
     public class TrainingSessionsController : ControllerBase
     {
-
         private readonly ITrainingSessionsService _trainingSessionsService;
 
         public TrainingSessionsController(ITrainingSessionsService trainingSessionsService)
@@ -28,7 +27,6 @@ namespace WorkoutTracker.Api.Controllers
             var trainingSessions = await _trainingSessionsService.GetTrainingSessionsAsync(queryParams);
             return Ok(trainingSessions);
         }
-
 
         // GET: api/TrainingSessions/5
         [HttpGet("{id}")]

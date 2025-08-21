@@ -1,7 +1,7 @@
 ﻿using WorkoutTracker.Api.DTOs.Auth;
 using WorkoutTracker.Api.Models;
 
-namespace WorkoutTracker.Api.Services
+namespace WorkoutTracker.Api.Services.Auth
 {
     public interface ITokenService
     {

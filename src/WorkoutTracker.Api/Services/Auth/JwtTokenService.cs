@@ -5,9 +5,8 @@ using System.Security.Cryptography;
 using System.Text;
 using WorkoutTracker.Api.DTOs.Auth;
 using WorkoutTracker.Api.Models;
-using WorkoutTracker.Api.Services.Auth;
 
-namespace WorkoutTracker.Api.Services
+namespace WorkoutTracker.Api.Services.Auth
 {
     public class JwtTokenService : ITokenService
     {
@@ -26,8 +25,6 @@ namespace WorkoutTracker.Api.Services
                 new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
-
-            // TODO: Consider adding roles to the token claims
 
             var jwtSettings = _configuration.GetSection("Jwt");
             var jwtAuthSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));

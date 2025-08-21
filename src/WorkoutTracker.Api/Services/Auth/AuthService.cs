@@ -12,14 +12,14 @@ namespace WorkoutTracker.Api.Services.Auth
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
+        private readonly IConfiguration _configuration;
 
-        const int refreshTokenDurationDays = 7; // TODO: Move it to some config
-
-        public AuthService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITokenService tokenService)
+        public AuthService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITokenService tokenService, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
             _tokenService = tokenService;
+            _configuration = configuration;
         }
 
         public async Task RegisterUserAsync(RegisterDto registerDto)
@@ -57,7 +57,7 @@ namespace WorkoutTracker.Api.Services.Auth
 
                 // Create refresh token
                 var refreshTokenValue = _tokenService.GenerateRefreshToken();
-                var refreshTokenExpiry = DateTime.UtcNow.AddDays(refreshTokenDurationDays); // TODO: Read it from the appsettings.json 
+                var refreshTokenExpiry = DateTime.UtcNow.AddDays(_configuration.GetValue<int>("Jwt:RefreshTokenDurationDays"));
                 var refreshToken = new UserRefreshToken
                 {
                     UserId = user.Id,
@@ -123,14 +123,14 @@ namespace WorkoutTracker.Api.Services.Auth
 
             // Rotation of refresh token
             var newRefreshTokenValue = _tokenService.GenerateRefreshToken();
-            var newRefreshTokenExpiry = DateTime.UtcNow.AddDays(refreshTokenDurationDays);
+            var newRefreshTokenExpiry = DateTime.UtcNow.AddDays(_configuration.GetValue<int>("Jwt:RefreshTokenDurationDays")); 
 
             // Update refresh token
             storedToken.Token = newRefreshTokenValue;
             storedToken.ExpirationDate = newRefreshTokenExpiry;
             storedToken.CreationDate = DateTime.UtcNow;
 
-            // Save new refresh token
+            // Save updated refresh token
             _context.RefreshTokens.Update(storedToken);
             await _context.SaveChangesAsync();
 
