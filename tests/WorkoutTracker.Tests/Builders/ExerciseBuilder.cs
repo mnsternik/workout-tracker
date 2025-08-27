@@ -89,7 +89,7 @@ namespace WorkoutTracker.Tests.Builders
 
         public ExerciseReadDto BuildReadDto()
         {
-            var exercise = new ExerciseReadDto
+            return new ExerciseReadDto
             {
                 Id = _id,
                 Name = _name,
@@ -102,13 +102,11 @@ namespace WorkoutTracker.Tests.Builders
                     .Select(mgl => new ExerciseMuscleGroupLinkDto { ExerciseId = _id, MuscleGroup = mgl.MuscleGroup })
                     .ToList()
             };
-
-            return exercise;
         }
 
         public ExerciseCreateDto BuildCreateDto()
         {
-            var exercise = new ExerciseCreateDto
+            return new ExerciseCreateDto
             {
                 Name = _name,
                 Description = _description,
@@ -120,8 +118,27 @@ namespace WorkoutTracker.Tests.Builders
                   .Select(mgl => new ExerciseMuscleGroupLinkDto { ExerciseId = _id, MuscleGroup = mgl.MuscleGroup })
                   .ToList()
             };
+        }
 
-            return exercise;
+        public List<Exercise> BuildManyDomains(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new ExerciseBuilder().WithId(i).WithName("Exercise " + i).BuildDomain())
+                .ToList();
+        }
+
+        public List<ExerciseReadDto> BuildManyReadDtos(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new ExerciseBuilder().WithId(i).WithName("Exercise " + i).BuildReadDto())
+                .ToList();
+        }
+
+        public List<ExerciseCreateDto> BuildManyCreateDtos(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new ExerciseBuilder().WithId(i).WithName("Exercise " + i).BuildCreateDto())
+                .ToList();
         }
     }
 }
