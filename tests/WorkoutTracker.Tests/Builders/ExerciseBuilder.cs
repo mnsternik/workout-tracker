@@ -10,7 +10,7 @@ namespace WorkoutTracker.Tests.Builders
         private string _description = "Push-up exercise is a close chain kinetic exercise which improves the joint proprioception, joint stability and muscle co-activation around the shoulder joint.";
         private string? _imageUrl = null;
         private ExerciseType _exerciseType = ExerciseType.Strength;
-        private ICollection<ExerciseMuscleGroupLink> _muscleGroupsLinks = new List<ExerciseMuscleGroupLink>();
+        private ICollection<ExerciseMuscleGroupLink> _muscleGroupsLinks = [];
         private Equipment _equipment = Equipment.None;
         private DifficultyLevel _difficultyLevel = DifficultyLevel.Intermediate;
 
@@ -85,8 +85,6 @@ namespace WorkoutTracker.Tests.Builders
 
             return exercise;
         }
-
-
         public ExerciseReadDto BuildReadDto()
         {
             return new ExerciseReadDto
