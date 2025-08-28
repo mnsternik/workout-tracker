@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WorkoutTracker.Api.DTOs.Training.Exercise;
+using WorkoutTracker.Api.Models;
 
 namespace WorkoutTracker.Api.DTOs.Training.TrainingSession
 {
@@ -10,13 +11,13 @@ namespace WorkoutTracker.Api.DTOs.Training.TrainingSession
         public string Name { get; init; } = string.Empty;
 
         [StringLength(1000)]
-        public string? Notes { get; init; }
+        public string? Note { get; init; }
 
         [Range(1, 5)]
-        public int? DifficultyRating { get; init; }
+        public DifficultyRating? DifficultyRating { get; init; }
 
         [Range(1, 1440)]
-        public int? EstimatedDurationMinutes { get; init; }
+        public int? DurationMinutes { get; init; }
 
         [Required]
         public IList<TrainingExerciseCreateDto> Exercises { get; init; } = new List<TrainingExerciseCreateDto>();

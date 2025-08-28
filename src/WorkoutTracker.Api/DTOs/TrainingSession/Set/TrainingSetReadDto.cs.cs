@@ -1,4 +1,4 @@
-﻿namespace WorkoutTracker.Api.DTOs.Training.Set
+﻿namespace WorkoutTracker.Api.DTOs.TrainingSession.Set
 {
     public record TrainingSetReadDto
     {

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using WorkoutTracker.Api.DTOs.Training.Set;
+using WorkoutTracker.Api.DTOs.TrainingSession.Set;
 
 namespace WorkoutTracker.Api.DTOs.Training.Exercise
 {

@@ -1,4 +1,6 @@
-﻿namespace WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession
+﻿using WorkoutTracker.Api.Models;
+
+namespace WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession
 {
     public class TrainingSessionQueryParameters
     {
@@ -19,8 +21,7 @@
         public string? DisplayName { get; set; } 
         public List<string>? ExerciseNames { get; set; } 
         public List<string>? MuscleGroups { get; set; } 
-        public int? MinDifficulty { get; set; }
-        public int? MaxDifficulty { get; set; }
+        public string? Difficulty { get; set; } // TODO: write examples
         public int? MinDurationMinutes { get; set; }
         public int? MaxDurationMinutes { get; set; }
         
