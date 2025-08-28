@@ -28,11 +28,14 @@ namespace WorkoutTracker.Api.Data
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.Notes)
+                entity.Property(e => e.Note)
                     .HasMaxLength(1000);
 
                 entity.Property(e => e.UserId)
                     .IsRequired();
+
+                entity.Property(e => e.DifficultyRating)
+                    .HasConversion<string>();
 
                 entity.HasMany(e => e.Exercises)
                     .WithOne(e => e.TrainingSession)

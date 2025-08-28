@@ -86,8 +86,8 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
 
             // Update basic properties
             sessionToUpdate.Name = trainingSessionDto.Name;
-            sessionToUpdate.Notes = trainingSessionDto.Notes;
-            sessionToUpdate.DurationMinutes = trainingSessionDto.EstimatedDurationMinutes;
+            sessionToUpdate.Note = trainingSessionDto.Note;
+            sessionToUpdate.DurationMinutes = trainingSessionDto.DurationMinutes;
             sessionToUpdate.DifficultyRating = trainingSessionDto.DifficultyRating;
 
             // Clear existing exercises and sets
@@ -171,13 +171,9 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             {
                 query = query.Where(t => t.User.DisplayName.ToLower().Contains(queryParams.DisplayName.ToLower()));
             }
-            if (queryParams.MinDifficulty.HasValue)
+            if (Enum.TryParse<DifficultyRating>(queryParams.Difficulty, ignoreCase: true, out var difficulty))
             {
-                query = query.Where(t => t.DifficultyRating >= queryParams.MinDifficulty.Value);
-            }
-            if (queryParams.MaxDifficulty.HasValue)
-            {
-                query = query.Where(t => t.DifficultyRating <= queryParams.MaxDifficulty.Value);
+                query = query.Where(t => t.DifficultyRating == difficulty);
             }
             if (queryParams.MinDurationMinutes.HasValue)
             {
