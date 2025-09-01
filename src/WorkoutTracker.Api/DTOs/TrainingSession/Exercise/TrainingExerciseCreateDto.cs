@@ -9,7 +9,7 @@ namespace WorkoutTracker.Api.DTOs.Training.Exercise
         public int OrderInSession { get; init; }
 
         [Required]
-        public int ExerciseId { get; init; }
+        public int ExerciseDefinitionId { get; init; }
 
         [Required]
         public IList<TrainingSetCreateDto> Sets { get; init; } = new List<TrainingSetCreateDto>();

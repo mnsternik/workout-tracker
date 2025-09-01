@@ -1,6 +1,6 @@
 ﻿namespace WorkoutTracker.Api.Models
 {
-    public class Exercise
+    public class ExerciseDefinition
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;

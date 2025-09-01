@@ -27,7 +27,7 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             var query = _context.TrainingSessions
                 .Include(t => t.User)
                 .Include(t => t.Exercises)
-                    .ThenInclude(te => te.Exercise)
+                    .ThenInclude(te => te.ExerciseDefinition)
                         .ThenInclude(e => e.MuscleGroupsLinks)
                 .Include(t => t.Exercises)
                     .ThenInclude(te => te.Sets)
@@ -49,7 +49,7 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             var trainingSession = await _context.TrainingSessions
                 .Include(t => t.User)
                 .Include(t => t.Exercises)
-                    .ThenInclude(te => te.Exercise)
+                    .ThenInclude(te => te.ExerciseDefinition)
                         .ThenInclude(e => e.MuscleGroupsLinks)
                 .Include(t => t.Exercises)
                     .ThenInclude(te => te.Sets)
@@ -186,13 +186,13 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             if (queryParams.ExerciseNames != null && queryParams.ExerciseNames.Count > 0)
             {
                 var lowerExerciseNames = queryParams.ExerciseNames.Select(e => e.ToLower()).ToList();
-                query = query.Where(t => t.Exercises.Any(te => lowerExerciseNames.Contains(te.Exercise.Name.ToLower())));
+                query = query.Where(t => t.Exercises.Any(te => lowerExerciseNames.Contains(te.ExerciseDefinition.Name.ToLower())));
             }
             if (queryParams.MuscleGroups != null && queryParams.MuscleGroups.Count > 0)
             {
                 var lowerMuscleGroups = queryParams.MuscleGroups.Select(mg => mg.ToLower()).ToList();
                 query = query.Where(t => t.Exercises.Any(te =>
-                    te.Exercise.MuscleGroupsLinks.Any(mgl =>
+                    te.ExerciseDefinition.MuscleGroupsLinks.Any(mgl =>
                         lowerMuscleGroups.Contains(mgl.MuscleGroup.ToString().ToLower()))));
             }
 
