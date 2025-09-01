@@ -17,7 +17,7 @@ namespace WorkoutTracker.Tests.Builders
         private int? _durationMinutes = 45;
         private string _userId = new Guid().ToString();
         private ApplicationUser User = new ApplicationUser();
-        private ICollection<TrainingExercise> Exercises = [];
+        private ICollection<TrainingExercise> _exercises = [];
 
         public TrainingSessionBuilder WithId(int id)
         {
@@ -43,9 +43,9 @@ namespace WorkoutTracker.Tests.Builders
             return this;
         }
 
-        public TrainingSessionBuilder WithDifficultyRating(DifficultyRating rating)
+        public TrainingSessionBuilder WithDifficultyRating(DifficultyRating difficulty)
         {
-            _difficultyRating = rating;
+            _difficultyRating = difficulty;
             return this;
         }
 
@@ -61,6 +61,55 @@ namespace WorkoutTracker.Tests.Builders
             return this;
         }
 
+        //public TrainingSessionBuilder WithExercises(int count)
+        //{
+        //    _exercises = Enumerable.Range(1, count)
+        //        .Select(i => new TrainingExercise
+        //        {
+        //            Id = i,
+        //            OrderInSession = i,
+        //            TrainingSessionId = _id,
+        //            ExerciseId = 1,
+        //            Sets =
+        //            {
+        //                new TrainingSet
+        //                {
+        //                    Id = i,
+        //                    OrderInExercise = 1,
+        //                    TrainingExerciseId = 1,
+        //                }
+        //            }
+
+        //        })
+        //        .ToList();
+
+        //    return this;
+        //}
+
+        // TODO: Add WithExercises method
+
+        public TrainingSession BuildDomain()
+        {
+            // var tsExercises = new ExerciseBuilder()
+            //  .WithTrainingSessionId(_id)
+
+            return new TrainingSession
+            {
+                Id = _id,
+                Name = _name,
+                Note = _note,
+                CreatedAt = _createdAt,
+                DifficultyRating = _difficultyRating,
+                DurationMinutes = _durationMinutes,
+                UserId = _userId,
+                //User = new ApplicationUser(),
+                //Exercises = []
+
+                // should TrainingExercises have thier own builder? Probably yes
+
+
+            };
+        }
 
     }
 }
