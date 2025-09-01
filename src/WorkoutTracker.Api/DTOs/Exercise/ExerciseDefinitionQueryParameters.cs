@@ -1,6 +1,6 @@
 ﻿namespace WorkoutTracker.Api.DTOs.Exercise
 {
-    public class ExerciseQueryParameters
+    public class ExerciseDefinitionQueryParameters
     {
         // Pagination
         private const int MaxPageSize = 50;

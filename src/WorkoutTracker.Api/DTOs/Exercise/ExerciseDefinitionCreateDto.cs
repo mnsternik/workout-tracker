@@ -3,7 +3,7 @@ using WorkoutTracker.Api.Models;
 
 namespace WorkoutTracker.Api.DTOs.Exercise
 {
-    public record ExerciseCreateDto
+    public record ExerciseDefinitionCreateDto
     {
         [Required]
         public string Name { get; init; } = string.Empty;
@@ -18,7 +18,7 @@ namespace WorkoutTracker.Api.DTOs.Exercise
         public ExerciseType ExerciseType { get; init; }
 
         [MinLength(1)]
-        public IList<ExerciseMuscleGroupLinkDto> MuscleGroups { get; init; } = new List<ExerciseMuscleGroupLinkDto>();
+        public IList<ExerciseDefinitionMuscleGroupLinkDto> MuscleGroups { get; init; } = new List<ExerciseDefinitionMuscleGroupLinkDto>();
 
         [Required]
         public Equipment Equipment { get; init; }

@@ -2,9 +2,9 @@
 
 namespace WorkoutTracker.Api.DTOs.Exercise
 {
-    public record ExerciseMuscleGroupLinkDto
+    public record ExerciseDefinitionMuscleGroupLinkDto
     {
-        public int ExerciseId { get; set; }
+        public int ExerciseDefinitionId { get; set; }
         public MuscleGroup MuscleGroup { get; set; }
     }
 }
