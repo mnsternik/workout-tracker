@@ -2,8 +2,8 @@
 using WorkoutTracker.Api.DTOs.Auth;
 using WorkoutTracker.Api.DTOs.Exercise;
 using WorkoutTracker.Api.DTOs.Training.Exercise;
-using WorkoutTracker.Api.DTOs.Training.Set;
 using WorkoutTracker.Api.DTOs.Training.TrainingSession;
+using WorkoutTracker.Api.DTOs.TrainingSession.Set;
 using WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession;
 using WorkoutTracker.Api.Models;
 
@@ -19,21 +19,21 @@ namespace WorkoutTracker.Api.Mapping
                     .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.DisplayName));
 
             // Predefined Exercises
-            CreateMap<ExerciseCreateDto, Exercise>()
+            CreateMap<ExerciseDefinitionCreateDto, ExerciseDefinition>()
                 .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.Ignore()); // MuscleGroupsLinks are handled separately after mapping
 
-            CreateMap<ExerciseUpdateDto, Exercise>()
+            CreateMap<ExerciseDefinitionUpdateDto, ExerciseDefinition>()
                 //.ForMember(dest => dest.MuscleGroupsLinks,
                 //    opt => opt.MapFrom(src => src.MuscleGroups)); ;
                 .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.Ignore());
 
-            CreateMap<Exercise, ExerciseReadDto>()
+            CreateMap<ExerciseDefinition, ExerciseDefinitionReadDto>()
                 .ForMember(dest => dest.MuscleGroups,
                     opt => opt.MapFrom(src => src.MuscleGroupsLinks));
 
             // ExerciseMuscleGroupLink
-            CreateMap<ExerciseMuscleGroupLink, ExerciseMuscleGroupLinkDto>();
-            CreateMap<ExerciseMuscleGroupLinkDto, ExerciseMuscleGroupLink>();
+            CreateMap<ExerciseMuscleGroupLink, ExerciseDefinitionMuscleGroupLinkDto>();
+            CreateMap<ExerciseDefinitionMuscleGroupLinkDto, ExerciseMuscleGroupLink>();
 
             // Training session's Sets
             CreateMap<TrainingSetCreateDto, TrainingSet>(); 

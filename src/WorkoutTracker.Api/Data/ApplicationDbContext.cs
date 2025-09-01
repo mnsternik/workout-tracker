@@ -14,7 +14,7 @@ namespace WorkoutTracker.Api.Data
         public DbSet<TrainingSession> TrainingSessions { get; set; }
         public DbSet<TrainingExercise> TrainingExercises { get; set; }
         public DbSet<TrainingSet> TrainingSets { get; set; }
-        public DbSet<Exercise> Exercises { get; set; }
+        public DbSet<ExerciseDefinition> Exercises { get; set; }
         public DbSet<ExerciseMuscleGroupLink> ExerciseMuscleGroupLinks { get; set; }
         public DbSet<UserRefreshToken> RefreshTokens { get; set; }
 
@@ -48,9 +48,9 @@ namespace WorkoutTracker.Api.Data
                 entity.Property(e => e.OrderInSession)
                     .IsRequired();
 
-                entity.HasOne(e => e.Exercise)
+                entity.HasOne(e => e.ExerciseDefinition)
                     .WithMany()
-                    .HasForeignKey(e => e.ExerciseId);
+                    .HasForeignKey(e => e.ExerciseDefinitionId);
 
                 entity.HasMany(e => e.Sets)
                     .WithOne(s => s.TrainingExercise)
@@ -67,7 +67,7 @@ namespace WorkoutTracker.Api.Data
                     .HasColumnType("decimal(6,2)");
             });
 
-            modelBuilder.Entity<Exercise>(entity =>
+            modelBuilder.Entity<ExerciseDefinition>(entity =>
             {
                 entity.Property(e => e.Name)
                     .IsRequired();
@@ -89,11 +89,11 @@ namespace WorkoutTracker.Api.Data
             modelBuilder.Entity<ExerciseMuscleGroupLink>(entity =>
             {
                 // Composite primary key
-                entity.HasKey(e => new { e.ExerciseId, e.MuscleGroup });
+                entity.HasKey(e => new { e.ExerciseDefinitionId, e.MuscleGroup });
 
-                entity.HasOne(e => e.Exercise)
+                entity.HasOne(e => e.ExerciseDefinition)
                     .WithMany(e => e.MuscleGroupsLinks)
-                    .HasForeignKey(e => e.ExerciseId);
+                    .HasForeignKey(e => e.ExerciseDefinitionId);
 
                 entity.Property(e => e.MuscleGroup)
                     .HasConversion<string>();

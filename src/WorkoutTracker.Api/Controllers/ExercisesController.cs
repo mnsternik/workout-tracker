@@ -17,14 +17,14 @@ namespace WorkoutTracker.Api.Controllers
 
         // GET: api/Exercises
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ExerciseReadDto>>> GetExercises([FromQuery] ExerciseQueryParameters queryParams)
+        public async Task<ActionResult<IEnumerable<ExerciseDefinitionReadDto>>> GetExercises([FromQuery] ExerciseDefinitionQueryParameters queryParams)
         {
             return await _exerciseService.GetExercisesAsync(queryParams);
         }
 
         // GET: api/Exercises/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ExerciseReadDto>> GetExercise(int id)
+        public async Task<ActionResult<ExerciseDefinitionReadDto>> GetExercise(int id)
         {
             var exerciseDto = await _exerciseService.GetExerciseAsync(id);      
             return Ok(exerciseDto);
@@ -32,7 +32,7 @@ namespace WorkoutTracker.Api.Controllers
 
         // PUT: api/Exercises/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutExercise(int id, ExerciseUpdateDto exerciseDto)
+        public async Task<IActionResult> PutExercise(int id, ExerciseDefinitionUpdateDto exerciseDto)
         {
             await _exerciseService.UpdateExerciseAsync(id, exerciseDto);
             return NoContent();
@@ -40,7 +40,7 @@ namespace WorkoutTracker.Api.Controllers
 
         // POST: api/Exercises
         [HttpPost]
-        public async Task<ActionResult<ExerciseReadDto>> PostExercise(ExerciseCreateDto exerciseDto)
+        public async Task<ActionResult<ExerciseDefinitionReadDto>> PostExercise(ExerciseDefinitionCreateDto exerciseDto)
         {
             var exercise = await _exerciseService.PostExerciseAsync(exerciseDto);
             return CreatedAtAction(nameof(GetExercise), new { id = exercise.Id }, exercise);

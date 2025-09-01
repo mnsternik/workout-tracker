@@ -5,10 +5,10 @@ namespace WorkoutTracker.Api.Services.Exercises
 {
     public interface IExerciseService
     {
-        public Task<PaginatedList<ExerciseReadDto>> GetExercisesAsync(ExerciseQueryParameters queryParams);
-        public Task<ExerciseReadDto> GetExerciseAsync(int id);
-        public Task<ExerciseReadDto> PostExerciseAsync(ExerciseCreateDto exerciseDto);
-        public Task UpdateExerciseAsync(int id, ExerciseUpdateDto exerciseDto);
+        public Task<PaginatedList<ExerciseDefinitionReadDto>> GetExercisesAsync(ExerciseDefinitionQueryParameters queryParams);
+        public Task<ExerciseDefinitionReadDto> GetExerciseAsync(int id);
+        public Task<ExerciseDefinitionReadDto> PostExerciseAsync(ExerciseDefinitionCreateDto exerciseDto);
+        public Task UpdateExerciseAsync(int id, ExerciseDefinitionUpdateDto exerciseDto);
         public Task DeleteExercise(int id); 
     }
 }

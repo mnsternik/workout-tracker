@@ -20,7 +20,7 @@ namespace WorkoutTracker.Api.Services.Exercises
             _mapper = mapper;
         }
 
-        public async Task<PaginatedList<ExerciseReadDto>> GetExercisesAsync(ExerciseQueryParameters queryParams)
+        public async Task<PaginatedList<ExerciseDefinitionReadDto>> GetExercisesAsync(ExerciseDefinitionQueryParameters queryParams)
         {
             // Base IQueryable for predefined exercises
             var query = _context.Exercises
@@ -32,13 +32,13 @@ namespace WorkoutTracker.Api.Services.Exercises
             query = SortExercises(query, queryParams);
 
             // Project to DTO
-            var dtoQuery = query.ProjectTo<ExerciseReadDto>(_mapper.ConfigurationProvider);
+            var dtoQuery = query.ProjectTo<ExerciseDefinitionReadDto>(_mapper.ConfigurationProvider);
 
             // Return paginated DTOs list
-            return await PaginatedList<ExerciseReadDto>.CreateAsync(dtoQuery, queryParams.PageNumber, queryParams.PageSize);
+            return await PaginatedList<ExerciseDefinitionReadDto>.CreateAsync(dtoQuery, queryParams.PageNumber, queryParams.PageSize);
         }
 
-        public async Task<ExerciseReadDto> GetExerciseAsync(int id)
+        public async Task<ExerciseDefinitionReadDto> GetExerciseAsync(int id)
         {
             var exercise = await _context.Exercises
                 .Include(e => e.MuscleGroupsLinks)
@@ -50,20 +50,20 @@ namespace WorkoutTracker.Api.Services.Exercises
                 throw new EntityNotFoundException("Exercise with this ID doesn't exist");
             }
 
-            return _mapper.Map<ExerciseReadDto>(exercise);
+            return _mapper.Map<ExerciseDefinitionReadDto>(exercise);
         }
 
-        public async Task<ExerciseReadDto> PostExerciseAsync(ExerciseCreateDto exerciseDto)
+        public async Task<ExerciseDefinitionReadDto> PostExerciseAsync(ExerciseDefinitionCreateDto exerciseDto)
         {
-            var exercise = _mapper.Map<Exercise>(exerciseDto);
+            var exercise = _mapper.Map<ExerciseDefinition>(exerciseDto);
 
             _context.Exercises.Add(exercise);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<ExerciseReadDto>(exercise);
+            return _mapper.Map<ExerciseDefinitionReadDto>(exercise);
         }
 
-        public async Task UpdateExerciseAsync(int id, ExerciseUpdateDto exerciseDto)
+        public async Task UpdateExerciseAsync(int id, ExerciseDefinitionUpdateDto exerciseDto)
         {
             if (id != exerciseDto.Id)
             {
@@ -117,7 +117,7 @@ namespace WorkoutTracker.Api.Services.Exercises
             await _context.SaveChangesAsync();
         }
 
-        private IQueryable<Exercise> FilterExercises(IQueryable<Exercise> query, ExerciseQueryParameters queryParams)
+        private IQueryable<ExerciseDefinition> FilterExercises(IQueryable<ExerciseDefinition> query, ExerciseDefinitionQueryParameters queryParams)
         {
             if (queryParams == null)
             {
@@ -147,7 +147,7 @@ namespace WorkoutTracker.Api.Services.Exercises
             return query;
         }
 
-        private IQueryable<Exercise> SortExercises(IQueryable<Exercise> query, ExerciseQueryParameters queryParams)
+        private IQueryable<ExerciseDefinition> SortExercises(IQueryable<ExerciseDefinition> query, ExerciseDefinitionQueryParameters queryParams)
         {
             if (!string.IsNullOrEmpty(queryParams.SortBy))
             {
