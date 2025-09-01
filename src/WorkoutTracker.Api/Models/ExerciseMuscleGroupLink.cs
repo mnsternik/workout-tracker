@@ -2,8 +2,8 @@
 {
     public class ExerciseMuscleGroupLink
     {
-        public int ExerciseId { get; set; }
-        public Exercise Exercise { get; set; } = null!;
+        public int ExerciseDefinitionId { get; set; }
+        public ExerciseDefinition ExerciseDefinition { get; set; } = null!;
         public MuscleGroup MuscleGroup { get; set; }
     }
 }
