@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WorkoutTracker.Api.DTOs.Exercise;
+using WorkoutTracker.Api.DTOs.ExerciseDefinition;
 using WorkoutTracker.Api.Services.Exercises;
 
 namespace WorkoutTracker.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ExercisesController : ControllerBase
+    public class ExerciseDefinitionsController : ControllerBase
     {
         private readonly IExerciseService _exerciseService;
 
-        public ExercisesController(IExerciseService exerciseService)
+        public ExerciseDefinitionsController(IExerciseService exerciseService)
         {
             _exerciseService = exerciseService;
         }

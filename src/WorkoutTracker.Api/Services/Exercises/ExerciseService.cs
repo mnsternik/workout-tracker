@@ -2,7 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Api.Data;
-using WorkoutTracker.Api.DTOs.Exercise;
+using WorkoutTracker.Api.DTOs.ExerciseDefinition;
 using WorkoutTracker.Api.Exceptions;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Utilities;
@@ -23,7 +23,7 @@ namespace WorkoutTracker.Api.Services.Exercises
         public async Task<PaginatedList<ExerciseDefinitionReadDto>> GetExercisesAsync(ExerciseDefinitionQueryParameters queryParams)
         {
             // Base IQueryable for predefined exercises
-            var query = _context.Exercises
+            var query = _context.ExerciseDefinitions
                 .Include(e => e.MuscleGroupsLinks)
                 .AsNoTracking();
 
@@ -40,7 +40,7 @@ namespace WorkoutTracker.Api.Services.Exercises
 
         public async Task<ExerciseDefinitionReadDto> GetExerciseAsync(int id)
         {
-            var exercise = await _context.Exercises
+            var exercise = await _context.ExerciseDefinitions
                 .Include(e => e.MuscleGroupsLinks)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -57,7 +57,7 @@ namespace WorkoutTracker.Api.Services.Exercises
         {
             var exercise = _mapper.Map<ExerciseDefinition>(exerciseDto);
 
-            _context.Exercises.Add(exercise);
+            _context.ExerciseDefinitions.Add(exercise);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<ExerciseDefinitionReadDto>(exercise);
@@ -70,7 +70,7 @@ namespace WorkoutTracker.Api.Services.Exercises
                 throw new EntityNotFoundException("ID of an exercise doesn't match with passed ID"); 
             }    
 
-            var exercise = await _context.Exercises
+            var exercise = await _context.ExerciseDefinitions
                 .Include(e => e.MuscleGroupsLinks)
                 .FirstOrDefaultAsync(e => e.Id == exerciseDto.Id);
 
@@ -107,13 +107,13 @@ namespace WorkoutTracker.Api.Services.Exercises
 
         public async Task DeleteExercise(int id)
         {
-            var exercise = await _context.Exercises.FindAsync(id);
+            var exercise = await _context.ExerciseDefinitions.FindAsync(id);
             if (exercise == null)
             {
                 throw new EntityNotFoundException("Exercise with this ID doesn't exist");
             }
 
-            _context.Exercises.Remove(exercise);
+            _context.ExerciseDefinitions.Remove(exercise);
             await _context.SaveChangesAsync();
         }
 
@@ -174,7 +174,7 @@ namespace WorkoutTracker.Api.Services.Exercises
 
         private bool ExerciseExists(int id)
         {
-            return _context.Exercises.Any(e => e.Id == id);
+            return _context.ExerciseDefinitions.Any(e => e.Id == id);
         }
     }
 }

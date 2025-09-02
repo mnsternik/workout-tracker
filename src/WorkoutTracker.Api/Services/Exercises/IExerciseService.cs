@@ -1,4 +1,4 @@
-﻿using WorkoutTracker.Api.DTOs.Exercise;
+﻿using WorkoutTracker.Api.DTOs.ExerciseDefinition;
 using WorkoutTracker.Api.Utilities;
 
 namespace WorkoutTracker.Api.Services.Exercises

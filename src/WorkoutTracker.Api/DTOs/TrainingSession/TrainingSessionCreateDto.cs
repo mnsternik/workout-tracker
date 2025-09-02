@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using WorkoutTracker.Api.DTOs.Training.Exercise;
+using WorkoutTracker.Api.DTOs.PerformedExercise;
 using WorkoutTracker.Api.Models;
 
-namespace WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession
+namespace WorkoutTracker.Api.DTOs.TrainingSession
 {
-    public class TrainingSessionUpdateDto
+    public record TrainingSessionCreateDto
     {
         [Required]
         [StringLength(100)]
@@ -20,6 +20,6 @@ namespace WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession
         public int? DurationMinutes { get; init; }
 
         [Required]
-        public IList<TrainingExerciseCreateDto> Exercises { get; init; } = new List<TrainingExerciseCreateDto>();
+        public IList<PerformedExerciseCreateDto> Exercises { get; init; } = new List<PerformedExerciseCreateDto>();
     }
 }

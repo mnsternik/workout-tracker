@@ -1,6 +1,6 @@
 ﻿namespace WorkoutTracker.Api.Models
 {
-    public class TrainingSet
+    public class PerformedSet
     {
         public int Id { get; set; }
         public int OrderInExercise { get; set; }
@@ -8,7 +8,7 @@
         public decimal? WeightKg { get; set; }
         public int? DurationSeconds { get; set; }
         public int? DistanceMeters { get; set; }
-        public int TrainingExerciseId { get; set; }
-        public TrainingExercise TrainingExercise { get; set; } = null!; 
+        public int PerformedExerciseId { get; set; }
+        public PerformedExercise PerformedExercise { get; set; } = null!; 
     }
 }

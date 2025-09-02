@@ -2,8 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Api.Data;
-using WorkoutTracker.Api.DTOs.Training.TrainingSession;
-using WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession;
+using WorkoutTracker.Api.DTOs.TrainingSession;
 using WorkoutTracker.Api.Exceptions;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Utilities;
@@ -26,10 +25,10 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             // Base IQueryable for training sessions
             var query = _context.TrainingSessions
                 .Include(t => t.User)
-                .Include(t => t.Exercises)
+                .Include(t => t.PerformedExercises)
                     .ThenInclude(te => te.ExerciseDefinition)
                         .ThenInclude(e => e.MuscleGroupsLinks)
-                .Include(t => t.Exercises)
+                .Include(t => t.PerformedExercises)
                     .ThenInclude(te => te.Sets)
                 .AsNoTracking();
 
@@ -48,10 +47,10 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
         {
             var trainingSession = await _context.TrainingSessions
                 .Include(t => t.User)
-                .Include(t => t.Exercises)
+                .Include(t => t.PerformedExercises)
                     .ThenInclude(te => te.ExerciseDefinition)
                         .ThenInclude(e => e.MuscleGroupsLinks)
-                .Include(t => t.Exercises)
+                .Include(t => t.PerformedExercises)
                     .ThenInclude(te => te.Sets)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
@@ -71,7 +70,7 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             }
 
             var sessionToUpdate = await _context.TrainingSessions
-                .Include(t => t.Exercises)
+                .Include(t => t.PerformedExercises)
                     .ThenInclude(te => te.Sets)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
@@ -91,17 +90,17 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             sessionToUpdate.DifficultyRating = trainingSessionDto.DifficultyRating;
 
             // Clear existing exercises and sets
-            _context.TrainingSets.RemoveRange(sessionToUpdate.Exercises.SelectMany(e => e.Sets));
-            _context.TrainingExercises.RemoveRange(sessionToUpdate.Exercises);
-            sessionToUpdate.Exercises.Clear();
+            _context.PerformedSets.RemoveRange(sessionToUpdate.PerformedExercises.SelectMany(e => e.Sets));
+            _context.PerformedExercises.RemoveRange(sessionToUpdate.PerformedExercises);
+            sessionToUpdate.PerformedExercises.Clear();
 
             // Add new exercises and their sets
             foreach (var exerciseDto in trainingSessionDto.Exercises)
             {
-                var exercise = _mapper.Map<TrainingExercise>(exerciseDto);
+                var exercise = _mapper.Map<PerformedExercise>(exerciseDto);
                 exercise.TrainingSessionId = id;
 
-                sessionToUpdate.Exercises.Add(exercise);
+                sessionToUpdate.PerformedExercises.Add(exercise);
             }
 
             try
@@ -186,12 +185,12 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             if (queryParams.ExerciseNames != null && queryParams.ExerciseNames.Count > 0)
             {
                 var lowerExerciseNames = queryParams.ExerciseNames.Select(e => e.ToLower()).ToList();
-                query = query.Where(t => t.Exercises.Any(te => lowerExerciseNames.Contains(te.ExerciseDefinition.Name.ToLower())));
+                query = query.Where(t => t.PerformedExercises.Any(te => lowerExerciseNames.Contains(te.ExerciseDefinition.Name.ToLower())));
             }
             if (queryParams.MuscleGroups != null && queryParams.MuscleGroups.Count > 0)
             {
                 var lowerMuscleGroups = queryParams.MuscleGroups.Select(mg => mg.ToLower()).ToList();
-                query = query.Where(t => t.Exercises.Any(te =>
+                query = query.Where(t => t.PerformedExercises.Any(te =>
                     te.ExerciseDefinition.MuscleGroupsLinks.Any(mgl =>
                         lowerMuscleGroups.Contains(mgl.MuscleGroup.ToString().ToLower()))));
             }

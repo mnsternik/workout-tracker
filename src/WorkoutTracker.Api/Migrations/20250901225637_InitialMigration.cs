@@ -52,21 +52,21 @@ namespace WorkoutTracker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TrainingSessions",
+                name: "ExerciseDefinitions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DifficultyRating = table.Column<int>(type: "int", nullable: true),
-                    EstimatedDurationTimeMinutes = table.Column<int>(type: "int", nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExerciseType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Equipment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DifficultyLevel = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrainingSessions", x => x.Id);
+                    table.PrimaryKey("PK_ExerciseDefinitions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -199,20 +199,68 @@ namespace WorkoutTracker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TrainingExercises",
+                name: "TrainingSessions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TrainingSessionId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DifficultyRating = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DurationMinutes = table.Column<int>(type: "int", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrainingExercises", x => x.Id);
+                    table.PrimaryKey("PK_TrainingSessions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TrainingExercises_TrainingSessions_TrainingSessionId",
+                        name: "FK_TrainingSessions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExerciseMuscleGroupLinks",
+                columns: table => new
+                {
+                    ExerciseDefinitionId = table.Column<int>(type: "int", nullable: false),
+                    MuscleGroup = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExerciseMuscleGroupLinks", x => new { x.ExerciseDefinitionId, x.MuscleGroup });
+                    table.ForeignKey(
+                        name: "FK_ExerciseMuscleGroupLinks_ExerciseDefinitions_ExerciseDefinitionId",
+                        column: x => x.ExerciseDefinitionId,
+                        principalTable: "ExerciseDefinitions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PerformedExercises",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderInSession = table.Column<int>(type: "int", nullable: false),
+                    TrainingSessionId = table.Column<int>(type: "int", nullable: false),
+                    ExerciseDefinitionId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PerformedExercises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PerformedExercises_ExerciseDefinitions_ExerciseDefinitionId",
+                        column: x => x.ExerciseDefinitionId,
+                        principalTable: "ExerciseDefinitions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PerformedExercises_TrainingSessions_TrainingSessionId",
                         column: x => x.TrainingSessionId,
                         principalTable: "TrainingSessions",
                         principalColumn: "Id",
@@ -220,24 +268,25 @@ namespace WorkoutTracker.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TrainingSets",
+                name: "PerformedSets",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TrainingExerciseId = table.Column<int>(type: "int", nullable: false),
+                    OrderInExercise = table.Column<int>(type: "int", nullable: false),
                     Reps = table.Column<int>(type: "int", nullable: true),
-                    Weight = table.Column<double>(type: "float", nullable: true),
-                    Duration = table.Column<double>(type: "float", nullable: true),
-                    DistanceMeters = table.Column<double>(type: "float", nullable: true)
+                    WeightKg = table.Column<decimal>(type: "decimal(6,2)", nullable: true),
+                    DurationSeconds = table.Column<int>(type: "int", nullable: true),
+                    DistanceMeters = table.Column<int>(type: "int", nullable: true),
+                    PerformedExerciseId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrainingSets", x => x.Id);
+                    table.PrimaryKey("PK_PerformedSets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TrainingSets_TrainingExercises_TrainingExerciseId",
-                        column: x => x.TrainingExerciseId,
-                        principalTable: "TrainingExercises",
+                        name: "FK_PerformedSets_PerformedExercises_PerformedExerciseId",
+                        column: x => x.PerformedExerciseId,
+                        principalTable: "PerformedExercises",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -282,19 +331,29 @@ namespace WorkoutTracker.Api.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PerformedExercises_ExerciseDefinitionId",
+                table: "PerformedExercises",
+                column: "ExerciseDefinitionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PerformedExercises_TrainingSessionId",
+                table: "PerformedExercises",
+                column: "TrainingSessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PerformedSets_PerformedExerciseId",
+                table: "PerformedSets",
+                column: "PerformedExerciseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
                 table: "RefreshTokens",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrainingExercises_TrainingSessionId",
-                table: "TrainingExercises",
-                column: "TrainingSessionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TrainingSets_TrainingExerciseId",
-                table: "TrainingSets",
-                column: "TrainingExerciseId");
+                name: "IX_TrainingSessions_UserId",
+                table: "TrainingSessions",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -316,22 +375,28 @@ namespace WorkoutTracker.Api.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "RefreshTokens");
+                name: "ExerciseMuscleGroupLinks");
 
             migrationBuilder.DropTable(
-                name: "TrainingSets");
+                name: "PerformedSets");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "PerformedExercises");
 
             migrationBuilder.DropTable(
-                name: "TrainingExercises");
+                name: "ExerciseDefinitions");
 
             migrationBuilder.DropTable(
                 name: "TrainingSessions");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

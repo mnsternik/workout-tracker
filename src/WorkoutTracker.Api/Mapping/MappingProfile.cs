@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using WorkoutTracker.Api.DTOs.Auth;
-using WorkoutTracker.Api.DTOs.Exercise;
-using WorkoutTracker.Api.DTOs.Training.Exercise;
-using WorkoutTracker.Api.DTOs.Training.TrainingSession;
-using WorkoutTracker.Api.DTOs.TrainingSession.Set;
-using WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession;
+using WorkoutTracker.Api.DTOs.ExerciseDefinition;
+using WorkoutTracker.Api.DTOs.PerformedExercise;
+using WorkoutTracker.Api.DTOs.PerformedSet;
+using WorkoutTracker.Api.DTOs.TrainingSession;
 using WorkoutTracker.Api.Models;
 
 namespace WorkoutTracker.Api.Mapping
@@ -23,8 +22,6 @@ namespace WorkoutTracker.Api.Mapping
                 .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.Ignore()); // MuscleGroupsLinks are handled separately after mapping
 
             CreateMap<ExerciseDefinitionUpdateDto, ExerciseDefinition>()
-                //.ForMember(dest => dest.MuscleGroupsLinks,
-                //    opt => opt.MapFrom(src => src.MuscleGroups)); ;
                 .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.Ignore());
 
             CreateMap<ExerciseDefinition, ExerciseDefinitionReadDto>()
@@ -36,25 +33,25 @@ namespace WorkoutTracker.Api.Mapping
             CreateMap<ExerciseDefinitionMuscleGroupLinkDto, ExerciseMuscleGroupLink>();
 
             // Training session's Sets
-            CreateMap<TrainingSetCreateDto, TrainingSet>(); 
-            CreateMap<TrainingSet, TrainingSetReadDto>(); 
+            CreateMap<PerformedSetCreateDto, PerformedSet>(); 
+            CreateMap<PerformedSet, PerformedSetReadDto>(); 
 
             // Training sessions's Exercises
-            CreateMap<TrainingExerciseCreateDto, TrainingExercise>()
+            CreateMap<PerformedExerciseCreateDto, PerformedExercise>()
                 .ForMember(dest => dest.Sets, opt => opt.MapFrom(src => src.Sets));
 
-            CreateMap<TrainingExercise, TrainingExerciseReadDto>()
+            CreateMap<PerformedExercise, PerformedExerciseReadDto>()
                 .ForMember(dest => dest.Sets, opt => opt.MapFrom(src => src.Sets)); 
 
             // Training sessions
             CreateMap<TrainingSessionCreateDto, TrainingSession>()
-                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises));
+                .ForMember(dest => dest.PerformedExercises, opt => opt.MapFrom(src => src.Exercises));
 
             CreateMap<TrainingSession, TrainingSessionReadDto>()
-                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises));
+                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.PerformedExercises));
 
             CreateMap<TrainingSessionUpdateDto, TrainingSession>()
-                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises));
+                .ForMember(dest => dest.PerformedExercises, opt => opt.MapFrom(src => src.Exercises));
         }
     }
 }
