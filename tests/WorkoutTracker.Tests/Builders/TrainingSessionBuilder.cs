@@ -61,27 +61,5 @@ namespace WorkoutTracker.Tests.Builders
         }
 
 
-        public TrainingSession BuildDomain()
-        {
-            // var tsExercises = new ExerciseBuilder()
-            //  .WithTrainingSessionId(_id)
-
-            return new TrainingSession
-            {
-                Id = _id,
-                Name = _name,
-                Note = _note,
-                CreatedAt = _createdAt,
-                DifficultyRating = _difficultyRating,
-                DurationMinutes = _durationMinutes,
-                UserId = _userId,
-                //User = new ApplicationUser(),
-                //Exercises = []
-
-                // should TrainingExercises have thier own builder? Probably yes
-
-            };
-        }
-
     }
 }
