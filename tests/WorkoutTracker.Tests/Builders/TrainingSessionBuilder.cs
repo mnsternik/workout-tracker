@@ -17,7 +17,7 @@ namespace WorkoutTracker.Tests.Builders
         private int? _durationMinutes = 45;
         private string _userId = new Guid().ToString();
         private ApplicationUser User = new ApplicationUser();
-        private ICollection<TrainingExercise> Exercises = [];
+        private ICollection<PerformedExercise> PerformedExercises = [];
 
         public TrainingSessionBuilder WithId(int id)
         {

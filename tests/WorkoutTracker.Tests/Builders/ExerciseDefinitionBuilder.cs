@@ -1,9 +1,9 @@
-﻿using WorkoutTracker.Api.DTOs.Exercise;
+﻿using WorkoutTracker.Api.DTOs.ExerciseDefinition;
 using WorkoutTracker.Api.Models;
 
 namespace WorkoutTracker.Tests.Builders
 {
-    public class ExerciseBuilder
+    public class ExerciseDefinitionBuilder
     {
         private int _id = 1;
         private string _name = "Push up";
@@ -14,36 +14,36 @@ namespace WorkoutTracker.Tests.Builders
         private Equipment _equipment = Equipment.None;
         private DifficultyLevel _difficultyLevel = DifficultyLevel.Intermediate;
 
-        public ExerciseBuilder WithId(int id)
+        public ExerciseDefinitionBuilder WithId(int id)
         {
             _id = id;
             return this;
         }
 
-        public ExerciseBuilder WithName(string name)
+        public ExerciseDefinitionBuilder WithName(string name)
         {
             _name = name;
             return this;
         }
 
-        public ExerciseBuilder WithDescription(string description)
+        public ExerciseDefinitionBuilder WithDescription(string description)
         {
             _description = description;
             return this;
         }
 
-        public ExerciseBuilder WithImageUrl(string imageUrl)
+        public ExerciseDefinitionBuilder WithImageUrl(string imageUrl)
         {
             _imageUrl = imageUrl;
             return this;
         }
-        public ExerciseBuilder WithExerciseType(ExerciseType type)
+        public ExerciseDefinitionBuilder WithExerciseType(ExerciseType type)
         {
             _exerciseType = type;
             return this;
         }
 
-        public ExerciseBuilder WithMuscleGroups(params MuscleGroup[] groups)
+        public ExerciseDefinitionBuilder WithMuscleGroups(params MuscleGroup[] groups)
         {
             _muscleGroupsLinks = groups
                 .Select(mg => new ExerciseMuscleGroupLink { MuscleGroup = mg })
@@ -51,21 +51,21 @@ namespace WorkoutTracker.Tests.Builders
             return this;
         }
 
-        public ExerciseBuilder WithEquipment(Equipment equipment)
+        public ExerciseDefinitionBuilder WithEquipment(Equipment equipment)
         {
             _equipment = equipment;
             return this;
         }
 
-        public ExerciseBuilder WithDifficultyLevel(DifficultyLevel level)
+        public ExerciseDefinitionBuilder WithDifficultyLevel(DifficultyLevel level)
         {
             _difficultyLevel = level;
             return this;
         }
 
-        public Exercise BuildDomain()
+        public ExerciseDefinition BuildDomain()
         {
-            var exercise = new Exercise
+            var exercise = new ExerciseDefinition
             {
                 Id = _id,
                 Name = _name,
@@ -78,16 +78,16 @@ namespace WorkoutTracker.Tests.Builders
 
             foreach (var link in _muscleGroupsLinks)
             {
-                link.Exercise = exercise;
-                link.ExerciseId = exercise.Id;
+                link.ExerciseDefinition = exercise;
+                link.ExerciseDefinitionId = exercise.Id;
                 exercise.MuscleGroupsLinks.Add(link);
             }
 
             return exercise;
         }
-        public ExerciseReadDto BuildReadDto()
+        public ExerciseDefinitionReadDto BuildReadDto()
         {
-            return new ExerciseReadDto
+            return new ExerciseDefinitionReadDto
             {
                 Id = _id,
                 Name = _name,
@@ -97,14 +97,14 @@ namespace WorkoutTracker.Tests.Builders
                 Equipment = _equipment,
                 DifficultyLevel = _difficultyLevel,
                 MuscleGroups = _muscleGroupsLinks
-                    .Select(mgl => new ExerciseMuscleGroupLinkDto { ExerciseId = _id, MuscleGroup = mgl.MuscleGroup })
+                    .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
                     .ToList()
             };
         }
 
-        public ExerciseCreateDto BuildCreateDto()
+        public ExerciseDefinitionCreateDto BuildCreateDto()
         {
-            return new ExerciseCreateDto
+            return new ExerciseDefinitionCreateDto
             {
                 Name = _name,
                 Description = _description,
@@ -113,29 +113,29 @@ namespace WorkoutTracker.Tests.Builders
                 Equipment = _equipment,
                 DifficultyLevel = _difficultyLevel,
                 MuscleGroups = _muscleGroupsLinks
-                  .Select(mgl => new ExerciseMuscleGroupLinkDto { ExerciseId = _id, MuscleGroup = mgl.MuscleGroup })
+                  .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
                   .ToList()
             };
         }
 
-        public List<Exercise> BuildManyDomains(int count)
+        public List<ExerciseDefinition> BuildManyDomains(int count)
         {
             return Enumerable.Range(1, count)
-                .Select(i => new ExerciseBuilder().WithId(i).WithName("Exercise " + i).BuildDomain())
+                .Select(i => new ExerciseDefinitionBuilder().WithId(i).WithName("Exercise " + i).BuildDomain())
                 .ToList();
         }
 
-        public List<ExerciseReadDto> BuildManyReadDtos(int count)
+        public List<ExerciseDefinitionReadDto> BuildManyReadDtos(int count)
         {
             return Enumerable.Range(1, count)
-                .Select(i => new ExerciseBuilder().WithId(i).WithName("Exercise " + i).BuildReadDto())
+                .Select(i => new ExerciseDefinitionBuilder().WithId(i).WithName("Exercise " + i).BuildReadDto())
                 .ToList();
         }
 
-        public List<ExerciseCreateDto> BuildManyCreateDtos(int count)
+        public List<ExerciseDefinitionCreateDto> BuildManyCreateDtos(int count)
         {
             return Enumerable.Range(1, count)
-                .Select(i => new ExerciseBuilder().WithId(i).WithName("Exercise " + i).BuildCreateDto())
+                .Select(i => new ExerciseDefinitionBuilder().WithId(i).WithName("Exercise " + i).BuildCreateDto())
                 .ToList();
         }
     }
