@@ -1,7 +1,7 @@
-﻿using WorkoutTracker.Api.DTOs.Training.Exercise;
+﻿using WorkoutTracker.Api.DTOs.PerformedExercise;
 using WorkoutTracker.Api.Models;
 
-namespace WorkoutTracker.Api.DTOs.Training.TrainingSession
+namespace WorkoutTracker.Api.DTOs.TrainingSession
 {
     public record TrainingSessionReadDto
     {
@@ -12,6 +12,6 @@ namespace WorkoutTracker.Api.DTOs.Training.TrainingSession
         public DifficultyRating? DifficultyRating { get; init; }
         public int? DurationMinutes { get; init; }
         public string UserId { get; init; } = string.Empty;
-        public IList<TrainingExerciseReadDto> Exercises { get; init; } = new List<TrainingExerciseReadDto>();
+        public IList<PerformedExerciseReadDto> Exercises { get; init; } = new List<PerformedExerciseReadDto>();
     }
 }

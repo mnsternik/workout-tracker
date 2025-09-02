@@ -1,6 +1,6 @@
-﻿namespace WorkoutTracker.Api.DTOs.TrainingSession.Set
+﻿namespace WorkoutTracker.Api.DTOs.PerformedSet
 {
-    public record TrainingSetReadDto
+    public record PerformedSetReadDto
     {
         public int Id { get; init; }
         public int OrderInExercise { get; init; }

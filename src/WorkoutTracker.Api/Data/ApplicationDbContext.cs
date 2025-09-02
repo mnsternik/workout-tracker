@@ -12,9 +12,9 @@ namespace WorkoutTracker.Api.Data
         }
 
         public DbSet<TrainingSession> TrainingSessions { get; set; }
-        public DbSet<TrainingExercise> TrainingExercises { get; set; }
-        public DbSet<TrainingSet> TrainingSets { get; set; }
-        public DbSet<ExerciseDefinition> Exercises { get; set; }
+        public DbSet<PerformedExercise> PerformedExercises { get; set; }
+        public DbSet<PerformedSet> PerformedSets { get; set; }
+        public DbSet<ExerciseDefinition> ExerciseDefinitions { get; set; }
         public DbSet<ExerciseMuscleGroupLink> ExerciseMuscleGroupLinks { get; set; }
         public DbSet<UserRefreshToken> RefreshTokens { get; set; }
 
@@ -37,13 +37,13 @@ namespace WorkoutTracker.Api.Data
                 entity.Property(e => e.DifficultyRating)
                     .HasConversion<string>();
 
-                entity.HasMany(e => e.Exercises)
+                entity.HasMany(e => e.PerformedExercises)
                     .WithOne(e => e.TrainingSession)
                     .HasForeignKey(e => e.TrainingSessionId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<TrainingExercise>(entity =>
+            modelBuilder.Entity<PerformedExercise>(entity =>
             {
                 entity.Property(e => e.OrderInSession)
                     .IsRequired();
@@ -53,12 +53,12 @@ namespace WorkoutTracker.Api.Data
                     .HasForeignKey(e => e.ExerciseDefinitionId);
 
                 entity.HasMany(e => e.Sets)
-                    .WithOne(s => s.TrainingExercise)
-                    .HasForeignKey(s => s.TrainingExerciseId)
+                    .WithOne(s => s.PerformedExercise)
+                    .HasForeignKey(s => s.PerformedExerciseId)
                     .OnDelete(DeleteBehavior.Cascade); 
             });
 
-            modelBuilder.Entity<TrainingSet>(entity =>
+            modelBuilder.Entity<PerformedSet>(entity =>
             {
                 entity.Property(e => e.OrderInExercise)
                     .IsRequired();

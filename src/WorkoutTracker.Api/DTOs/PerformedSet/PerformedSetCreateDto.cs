@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WorkoutTracker.Api.DTOs.TrainingSession.Set
+namespace WorkoutTracker.Api.DTOs.PerformedSet
 {
-    public record TrainingSetCreateDto
+    public record PerformedSetCreateDto
     {
         [Range(0, 999)]
         public int OrderInExercise { get; init; }

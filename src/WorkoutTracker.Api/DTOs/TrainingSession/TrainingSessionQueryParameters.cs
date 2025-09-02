@@ -1,6 +1,4 @@
-﻿using WorkoutTracker.Api.Models;
-
-namespace WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession
+﻿namespace WorkoutTracker.Api.DTOs.TrainingSession
 {
     public class TrainingSessionQueryParameters
     {
@@ -11,7 +9,7 @@ namespace WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession
         public int PageSize
         {
             get => _pageSize;
-            set => _pageSize = (value > MaxPageSize) ? MaxPageSize : (value < 1 ? 1 : value);
+            set => _pageSize = value > MaxPageSize ? MaxPageSize : value < 1 ? 1 : value;
         }
 
         public int PageNumber { get; set; } = 1;
@@ -21,7 +19,7 @@ namespace WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession
         public string? DisplayName { get; set; } 
         public List<string>? ExerciseNames { get; set; } 
         public List<string>? MuscleGroups { get; set; } 
-        public string? Difficulty { get; set; } // TODO: write examples
+        public string? Difficulty { get; set; } // e.g "easy", "hard"
         public int? MinDurationMinutes { get; set; }
         public int? MaxDurationMinutes { get; set; }
         

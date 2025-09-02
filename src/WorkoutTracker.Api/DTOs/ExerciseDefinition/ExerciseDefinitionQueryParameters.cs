@@ -1,4 +1,4 @@
-﻿namespace WorkoutTracker.Api.DTOs.Exercise
+﻿namespace WorkoutTracker.Api.DTOs.ExerciseDefinition
 {
     public class ExerciseDefinitionQueryParameters
     {
@@ -9,7 +9,7 @@
         public int PageSize
         {
             get => _pageSize;
-            set => _pageSize = (value > MaxPageSize) ? MaxPageSize : (value < 1 ? 1 : value);
+            set => _pageSize = value > MaxPageSize ? MaxPageSize : value < 1 ? 1 : value;
         }
 
         public int PageNumber { get; set; } = 1;

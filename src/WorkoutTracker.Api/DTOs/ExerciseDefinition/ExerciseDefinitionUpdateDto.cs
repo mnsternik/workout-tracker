@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WorkoutTracker.Api.Models;
 
-namespace WorkoutTracker.Api.DTOs.Exercise
+namespace WorkoutTracker.Api.DTOs.ExerciseDefinition
 {
     public record ExerciseDefinitionUpdateDto
     {

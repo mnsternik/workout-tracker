@@ -1,8 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WorkoutTracker.Api.DTOs.Training.TrainingSession;
-using WorkoutTracker.Api.DTOs.TrainingSession.TrainingSession;
+using WorkoutTracker.Api.DTOs.TrainingSession;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Services.TrainingSessions;
 using WorkoutTracker.Api.Utilities;
