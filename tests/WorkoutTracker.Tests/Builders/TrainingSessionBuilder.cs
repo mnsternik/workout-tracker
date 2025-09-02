@@ -17,12 +17,7 @@ namespace WorkoutTracker.Tests.Builders
         private int? _durationMinutes = 45;
         private string _userId = new Guid().ToString();
         private ApplicationUser User = new ApplicationUser();
-<<<<<<< HEAD
         private ICollection<PerformedExercise> PerformedExercises = [];
-=======
-        private ICollection<TrainingExercise> _exercises = [];
->>>>>>> 9818cb74ac0ead0c921eb8b06a6864f53e47d8af
-
         public TrainingSessionBuilder WithId(int id)
         {
             _id = id;
@@ -65,32 +60,6 @@ namespace WorkoutTracker.Tests.Builders
             return this;
         }
 
-        //public TrainingSessionBuilder WithExercises(int count)
-        //{
-        //    _exercises = Enumerable.Range(1, count)
-        //        .Select(i => new TrainingExercise
-        //        {
-        //            Id = i,
-        //            OrderInSession = i,
-        //            TrainingSessionId = _id,
-        //            ExerciseId = 1,
-        //            Sets =
-        //            {
-        //                new TrainingSet
-        //                {
-        //                    Id = i,
-        //                    OrderInExercise = 1,
-        //                    TrainingExerciseId = 1,
-        //                }
-        //            }
-
-        //        })
-        //        .ToList();
-
-        //    return this;
-        //}
-
-        // TODO: Add WithExercises method
 
         public TrainingSession BuildDomain()
         {
@@ -110,7 +79,6 @@ namespace WorkoutTracker.Tests.Builders
                 //Exercises = []
 
                 // should TrainingExercises have thier own builder? Probably yes
-
 
             };
         }

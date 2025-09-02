@@ -15,29 +15,11 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
             _exerciseController = new ExerciseDefinitionsController(_mockExerciseService.Object);
         }
 
-<<<<<<< HEAD
+
         [Fact]
         public async Task GetExercises_ReturnsOK_WithExercises()
         {
-            // Arrange
-=======
-        //[Fact]
-        //public async Task GetExercises_ReturnsOK_WithExercises()
-        //{
-        //    // Arrange
-        //    var queryParams = new ExerciseQueryParameters();
-            
-        //    //var exercises = ExercisesSampleData.Get();
-
-
-        //    //_mockExerciseService.Setup(s => s.GetExercisesAsync(queryParams)).ReturnsAsync(sampleExercises);
->>>>>>> 9818cb74ac0ead0c921eb8b06a6864f53e47d8af
-
-
-        //    // Act
-
-
-        //    // Assert
-        //}
+            throw new NotImplementedException();
+        }
     }
 }
