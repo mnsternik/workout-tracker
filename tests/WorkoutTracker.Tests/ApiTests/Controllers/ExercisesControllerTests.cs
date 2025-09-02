@@ -2,8 +2,6 @@
 using WorkoutTracker.Api.Controllers;
 using WorkoutTracker.Api.DTOs.Exercise;
 using WorkoutTracker.Api.Services.Exercises;
-using WorkoutTracker.Api.Utilities;
-using WorkoutTracker.Tests.SampleData;
 
 namespace WorkoutTracker.Tests.ApiTests.Controllers
 {
@@ -18,22 +16,22 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
             _exerciseController = new ExercisesController(_mockExerciseService.Object);
         }
 
-        [Fact]
-        public async Task GetExercises_ReturnsOK_WithExercises()
-        {
-            // Arrange
-            var queryParams = new ExerciseQueryParameters();
+        //[Fact]
+        //public async Task GetExercises_ReturnsOK_WithExercises()
+        //{
+        //    // Arrange
+        //    var queryParams = new ExerciseQueryParameters();
             
-            //var exercises = ExercisesSampleData.Get();
+        //    //var exercises = ExercisesSampleData.Get();
 
 
-            //_mockExerciseService.Setup(s => s.GetExercisesAsync(queryParams)).ReturnsAsync(sampleExercises);
+        //    //_mockExerciseService.Setup(s => s.GetExercisesAsync(queryParams)).ReturnsAsync(sampleExercises);
 
 
-            // Act
+        //    // Act
 
 
-            // Assert
-        }
+        //    // Assert
+        //}
     }
 }

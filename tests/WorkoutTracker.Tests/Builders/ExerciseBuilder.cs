@@ -63,9 +63,9 @@ namespace WorkoutTracker.Tests.Builders
             return this;
         }
 
-        public Exercise BuildDomain()
+        public ExerciseDefinition BuildDomain()
         {
-            var exercise = new Exercise
+            var exercise = new ExerciseDefinition
             {
                 Id = _id,
                 Name = _name,
@@ -78,16 +78,16 @@ namespace WorkoutTracker.Tests.Builders
 
             foreach (var link in _muscleGroupsLinks)
             {
-                link.Exercise = exercise;
-                link.ExerciseId = exercise.Id;
+                link.ExerciseDefinition = exercise;
+                link.ExerciseDefinitionId = exercise.Id;
                 exercise.MuscleGroupsLinks.Add(link);
             }
 
             return exercise;
         }
-        public ExerciseReadDto BuildReadDto()
+        public ExerciseDefinitionReadDto BuildReadDto()
         {
-            return new ExerciseReadDto
+            return new ExerciseDefinitionReadDto
             {
                 Id = _id,
                 Name = _name,
@@ -97,14 +97,14 @@ namespace WorkoutTracker.Tests.Builders
                 Equipment = _equipment,
                 DifficultyLevel = _difficultyLevel,
                 MuscleGroups = _muscleGroupsLinks
-                    .Select(mgl => new ExerciseMuscleGroupLinkDto { ExerciseId = _id, MuscleGroup = mgl.MuscleGroup })
+                    .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
                     .ToList()
             };
         }
 
-        public ExerciseCreateDto BuildCreateDto()
+        public ExerciseDefinitionCreateDto BuildCreateDto()
         {
-            return new ExerciseCreateDto
+            return new ExerciseDefinitionCreateDto
             {
                 Name = _name,
                 Description = _description,
@@ -113,26 +113,26 @@ namespace WorkoutTracker.Tests.Builders
                 Equipment = _equipment,
                 DifficultyLevel = _difficultyLevel,
                 MuscleGroups = _muscleGroupsLinks
-                  .Select(mgl => new ExerciseMuscleGroupLinkDto { ExerciseId = _id, MuscleGroup = mgl.MuscleGroup })
+                  .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
                   .ToList()
             };
         }
 
-        public List<Exercise> BuildManyDomains(int count)
+        public List<ExerciseDefinition> BuildManyDomains(int count)
         {
             return Enumerable.Range(1, count)
                 .Select(i => new ExerciseBuilder().WithId(i).WithName("Exercise " + i).BuildDomain())
                 .ToList();
         }
 
-        public List<ExerciseReadDto> BuildManyReadDtos(int count)
+        public List<ExerciseDefinitionReadDto> BuildManyReadDtos(int count)
         {
             return Enumerable.Range(1, count)
                 .Select(i => new ExerciseBuilder().WithId(i).WithName("Exercise " + i).BuildReadDto())
                 .ToList();
         }
 
-        public List<ExerciseCreateDto> BuildManyCreateDtos(int count)
+        public List<ExerciseDefinitionCreateDto> BuildManyCreateDtos(int count)
         {
             return Enumerable.Range(1, count)
                 .Select(i => new ExerciseBuilder().WithId(i).WithName("Exercise " + i).BuildCreateDto())
