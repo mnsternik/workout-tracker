@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WorkoutTracker.Api.DTOs.ExerciseDefinition;
-using WorkoutTracker.Api.Services.Exercises;
+using WorkoutTracker.Api.Services.ExerciseDefinitions;
 
 namespace WorkoutTracker.Api.Controllers
 {
@@ -8,9 +8,9 @@ namespace WorkoutTracker.Api.Controllers
     [ApiController]
     public class ExerciseDefinitionsController : ControllerBase
     {
-        private readonly IExerciseService _exerciseService;
+        private readonly IExerciseDefinitionsService _exerciseService;
 
-        public ExerciseDefinitionsController(IExerciseService exerciseService)
+        public ExerciseDefinitionsController(IExerciseDefinitionsService exerciseService)
         {
             _exerciseService = exerciseService;
         }

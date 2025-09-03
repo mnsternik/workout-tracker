@@ -8,7 +8,7 @@ using WorkoutTracker.Api.Filters;
 using WorkoutTracker.Api.Mapping;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Services.Auth;
-using WorkoutTracker.Api.Services.Exercises;
+using WorkoutTracker.Api.Services.ExerciseDefinitions;
 using WorkoutTracker.Api.Services.TrainingSessions;
 
 namespace WorkoutTracker.Api
@@ -104,7 +104,7 @@ namespace WorkoutTracker.Api
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITokenService, JwtTokenService>();
             builder.Services.AddScoped<ITrainingSessionsService, TrainingSessionService>();
-            builder.Services.AddScoped<IExerciseService, ExerciseService>();
+            builder.Services.AddScoped<IExerciseDefinitionsService, ExerciseDefinitionsService>();
 
             var app = builder.Build();
 
