@@ -1,9 +1,9 @@
 ﻿using WorkoutTracker.Api.DTOs.ExerciseDefinition;
 using WorkoutTracker.Api.Utilities;
 
-namespace WorkoutTracker.Api.Services.Exercises
+namespace WorkoutTracker.Api.Services.ExerciseDefinitions
 {
-    public interface IExerciseService
+    public interface IExerciseDefinitionsService
     {
         public Task<PaginatedList<ExerciseDefinitionReadDto>> GetExercisesAsync(ExerciseDefinitionQueryParameters queryParams);
         public Task<ExerciseDefinitionReadDto> GetExerciseAsync(int id);

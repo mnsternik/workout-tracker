@@ -7,14 +7,14 @@ using WorkoutTracker.Api.Exceptions;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Utilities;
 
-namespace WorkoutTracker.Api.Services.Exercises
+namespace WorkoutTracker.Api.Services.ExerciseDefinitions
 {
-    public class ExerciseService : IExerciseService
+    public class ExerciseDefinitionsService : IExerciseDefinitionsService
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public ExerciseService(ApplicationDbContext context, IMapper mapper)
+        public ExerciseDefinitionsService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
