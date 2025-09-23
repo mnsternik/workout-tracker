@@ -76,7 +76,7 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
 
             if (exercise == null)
             {
-                throw new EntityNotFoundException("This exercise doesn't exist");
+                throw new EntityNotFoundException("Exercise with this ID doesn't exist");
             }
 
             _mapper.Map(exerciseDto, exercise);
@@ -105,7 +105,7 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
             }
         }
 
-        public async Task DeleteExercise(int id)
+        public async Task DeleteExerciseAsync(int id)
         {
             var exercise = await _context.ExerciseDefinitions.FindAsync(id);
             if (exercise == null)
