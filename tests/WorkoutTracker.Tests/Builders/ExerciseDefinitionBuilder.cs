@@ -7,7 +7,7 @@ namespace WorkoutTracker.Tests.Builders
     {
         private int _id = 1;
         private string _name = "Push up";
-        private string _description = "Push-up exercise is a close chain kinetic exercise which improves the joint proprioception, joint stability and muscle co-activation around the shoulder joint.";
+        private string _description = "Test exercise definition's description";
         private string? _imageUrl = null;
         private ExerciseType _exerciseType = ExerciseType.Strength;
         private ICollection<ExerciseMuscleGroupLink> _muscleGroupsLinks = [];
@@ -115,6 +115,23 @@ namespace WorkoutTracker.Tests.Builders
                 MuscleGroups = _muscleGroupsLinks
                   .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
                   .ToList()
+            };
+        }
+
+        public ExerciseDefinitionUpdateDto BuildUpdateDto()
+        {
+            return new ExerciseDefinitionUpdateDto
+            {
+                Id = _id,
+                Name = _name,
+                Description = _description,
+                ImageUrl = _imageUrl,
+                ExerciseType = _exerciseType,
+                Equipment = _equipment,
+                DifficultyLevel = _difficultyLevel,
+                MuscleGroups = _muscleGroupsLinks
+                    .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
+                    .ToList()
             };
         }
 
