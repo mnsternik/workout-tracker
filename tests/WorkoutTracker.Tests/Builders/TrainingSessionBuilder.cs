@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WorkoutTracker.Api.Models;
+﻿using WorkoutTracker.Api.Models;
 
 namespace WorkoutTracker.Tests.Builders
 {
@@ -16,8 +11,12 @@ namespace WorkoutTracker.Tests.Builders
         private DifficultyRating? _difficultyRating = DifficultyRating.Easy;
         private int? _durationMinutes = 45;
         private string _userId = new Guid().ToString();
-        private ApplicationUser User = new ApplicationUser();
-        private ICollection<PerformedExercise> PerformedExercises = [];
+        private ApplicationUser _user = null!;
+        private ICollection<PerformedExercise> _performedExercises = [];
+
+        // Declares how many generated PerformedExercises with default values each TrainingSession will have 
+        private int _exercisesCount = 1; 
+
         public TrainingSessionBuilder WithId(int id)
         {
             _id = id;
@@ -60,6 +59,33 @@ namespace WorkoutTracker.Tests.Builders
             return this;
         }
 
+        public TrainingSessionBuilder WithUser(ApplicationUser user)
+        {
+            _user = user;
+            _userId = user.Id;
+            return this;
+        }
 
+        public TrainingSessionBuilder WithDefaultExercises(int exercisesCount)
+        {
+            _exercisesCount = exercisesCount;
+            return this; 
+        }
+
+        public TrainingSession BuildDomain()
+        {
+            return new TrainingSession
+            {
+                Id = _id,
+                Name = _name,
+                Note = _note,
+                CreatedAt = _createdAt,
+                DifficultyRating = _difficultyRating,
+                DurationMinutes = _durationMinutes,
+                UserId = _userId,
+                User = _user,
+                PerformedExercises = _performedExercises
+            };
+        }
     }
 }
