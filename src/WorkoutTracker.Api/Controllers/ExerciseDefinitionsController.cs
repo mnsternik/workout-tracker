@@ -19,7 +19,8 @@ namespace WorkoutTracker.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExerciseDefinitionReadDto>>> GetExercises([FromQuery] ExerciseDefinitionQueryParameters queryParams)
         {
-            return await _exerciseService.GetExercisesAsync(queryParams);
+            var exerciseDtos = await _exerciseService.GetExercisesAsync(queryParams);
+            return Ok(exerciseDtos);
         }
 
         // GET: api/Exercises/5
@@ -30,14 +31,6 @@ namespace WorkoutTracker.Api.Controllers
             return Ok(exerciseDto);
         }
 
-        // PUT: api/Exercises/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutExercise(int id, ExerciseDefinitionUpdateDto exerciseDto)
-        {
-            await _exerciseService.UpdateExerciseAsync(id, exerciseDto);
-            return NoContent();
-        }
-
         // POST: api/Exercises
         [HttpPost]
         public async Task<ActionResult<ExerciseDefinitionReadDto>> PostExercise(ExerciseDefinitionCreateDto exerciseDto)
@@ -46,11 +39,19 @@ namespace WorkoutTracker.Api.Controllers
             return CreatedAtAction(nameof(GetExercise), new { id = exercise.Id }, exercise);
         }
 
+        // PUT: api/Exercises/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutExercise(int id, ExerciseDefinitionUpdateDto exerciseDto)
+        {
+            await _exerciseService.UpdateExerciseAsync(id, exerciseDto);
+            return NoContent();
+        }
+
         // DELETE: api/Exercises/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExercise(int id)
         {
-            await _exerciseService.DeleteExercise(id);
+            await _exerciseService.DeleteExerciseAsync(id);
             return NoContent();
         }
     }
