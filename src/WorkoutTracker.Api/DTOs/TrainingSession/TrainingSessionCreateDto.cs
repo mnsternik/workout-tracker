@@ -7,7 +7,8 @@ namespace WorkoutTracker.Api.DTOs.TrainingSession
     public record TrainingSessionCreateDto
     {
         [Required]
-        [StringLength(100)]
+        [MinLength(1, ErrorMessage = "Training session's name cannot be empty")]
+        [MaxLength(100, ErrorMessage = "Training session's name must be shorter than 100 characters")]
         public string Name { get; init; } = string.Empty;
 
         [StringLength(1000)]

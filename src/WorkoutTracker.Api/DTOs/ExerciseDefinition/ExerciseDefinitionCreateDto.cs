@@ -6,6 +6,8 @@ namespace WorkoutTracker.Api.DTOs.ExerciseDefinition
     public record ExerciseDefinitionCreateDto
     {
         [Required]
+        [MinLength(1, ErrorMessage = "Exercise name cannot be empty")]
+        [MaxLength(100, ErrorMessage = "Exercise name must be shorter than 100 characters")]
         public string Name { get; init; } = string.Empty;
 
         [Required]
