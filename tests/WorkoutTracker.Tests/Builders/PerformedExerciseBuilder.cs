@@ -5,7 +5,10 @@ namespace WorkoutTracker.Tests.Builders
 {
     public class PerformedExerciseBuilder
     {
-        private int _id = 1;
+        // Used for generating objects with uniqe ID, increased by 1 after every build
+        private static int _globalId = 1;
+
+        private int _id = _globalId;
         private int _orderInSession = 1;
         private int _trainingSessionId = 1;
         private int _exerciseDefinitionId = 1;
@@ -61,7 +64,7 @@ namespace WorkoutTracker.Tests.Builders
         
         public PerformedExercise BuildDomain()
         {
-            return new PerformedExercise
+            var exercise = new PerformedExercise
             {
                 Id = _id,
                 OrderInSession = _orderInSession,
@@ -71,6 +74,9 @@ namespace WorkoutTracker.Tests.Builders
                 ExerciseDefinition  = _exerciseDefinition,
                 Sets = new PerformedSetBuilder().BuildManyDomains(_setsCount)
             };
+
+            _globalId++;
+            return exercise;
         }
 
         public PerformedExerciseCreateDto BuildCreateDto()
@@ -85,13 +91,16 @@ namespace WorkoutTracker.Tests.Builders
 
         public PerformedExerciseReadDto BuildReadDto()
         {
-            return new PerformedExerciseReadDto
+            var exercise = new PerformedExerciseReadDto
             {
                 Id = _id,
                 OrderInSession = _orderInSession,
                 ExerciseDefinitionId = _exerciseDefinitionId,
                 Sets = new PerformedSetBuilder().BuildManyReadDtos(_setsCount)
             };
+
+            _globalId++;
+            return exercise;
         }
 
         public List<PerformedExercise> BuildManyDomains(int count)

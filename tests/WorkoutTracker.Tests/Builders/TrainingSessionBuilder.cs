@@ -4,7 +4,10 @@ namespace WorkoutTracker.Tests.Builders
 {
     public class TrainingSessionBuilder
     {
-        private int _id = 1;
+        // Used for generating objects with uniqe ID, increased by 1 after every build
+        private static int _globalId = 1; 
+
+        private int _id = _globalId;
         private string _name = "My training session";
         private string? _note = "Notes to my trainig session";
         private DateTime _createdAt = DateTime.UtcNow;
@@ -74,7 +77,7 @@ namespace WorkoutTracker.Tests.Builders
 
         public TrainingSession BuildDomain()
         {
-            return new TrainingSession
+            var training = new TrainingSession
             {
                 Id = _id,
                 Name = _name,
@@ -86,6 +89,9 @@ namespace WorkoutTracker.Tests.Builders
                 User = _user,
                 PerformedExercises = _performedExercises
             };
+
+            _globalId++;
+            return training;
         }
     }
 }

@@ -5,8 +5,11 @@ namespace WorkoutTracker.Tests.Builders
 {
     public class ExerciseDefinitionBuilder
     {
-        private int _id = 1;
-        private string _name = "Push up";
+        // Used for generating objects with uniqe ID, increased by 1 after every build
+        private static int _globalId = 1; 
+
+        private int _id = _globalId;
+        private string _name = $"Exercise definition {_globalId}"; // Name must be uniqe
         private string _description = "Test exercise definition's description";
         private string? _imageUrl = null;
         private ExerciseType _exerciseType = ExerciseType.Strength;
@@ -83,11 +86,12 @@ namespace WorkoutTracker.Tests.Builders
                 exercise.MuscleGroupsLinks.Add(link);
             }
 
+            _globalId++; 
             return exercise;
         }
         public ExerciseDefinitionReadDto BuildReadDto()
         {
-            return new ExerciseDefinitionReadDto
+            var exercise =  new ExerciseDefinitionReadDto
             {
                 Id = _id,
                 Name = _name,
@@ -100,6 +104,9 @@ namespace WorkoutTracker.Tests.Builders
                     .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
                     .ToList()
             };
+
+            _globalId++;
+            return exercise;
         }
 
         public ExerciseDefinitionCreateDto BuildCreateDto()
@@ -120,7 +127,7 @@ namespace WorkoutTracker.Tests.Builders
 
         public ExerciseDefinitionUpdateDto BuildUpdateDto()
         {
-            return new ExerciseDefinitionUpdateDto
+            var exercise = new ExerciseDefinitionUpdateDto
             {
                 Id = _id,
                 Name = _name,
@@ -133,6 +140,9 @@ namespace WorkoutTracker.Tests.Builders
                     .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
                     .ToList()
             };
+
+            _globalId++;
+            return exercise;
         }
 
         public List<ExerciseDefinition> BuildManyDomains(int count)

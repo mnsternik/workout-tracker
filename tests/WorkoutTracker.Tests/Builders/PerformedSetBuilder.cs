@@ -5,7 +5,7 @@ namespace WorkoutTracker.Tests.Builders
 {
     public class PerformedSetBuilder
     {
-        // Global ID used for generating Sets with uniqe ID while generating multiple TrainingSessions with TrainingSessionBuilder.BuildMany()
+        // Used for generating objects with uniqe ID, increased by 1 after every build
         private static int _globalId = 1; 
 
         private int _id = _globalId;
