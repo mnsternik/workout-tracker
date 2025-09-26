@@ -14,12 +14,12 @@
 
         public int PageNumber { get; set; } = 1;
 
-        // Exercise properties
+        // Exercise definition properties
         public string Name { get; set; } = string.Empty;
         public string ExerciseType { get; set; } = string.Empty;
-        public string MuscleGroup { get; set; } = string.Empty;
         public string Equipment { get; set; } = string.Empty;
         public string DifficultyLevel { get; set; } = string.Empty;
+        public string[] MuscleGroups { get; set; } = [];
 
         // Sorting
         public string? SortBy { get; set; } // e.g. "name", "difficultyLevel"

@@ -131,10 +131,6 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
             {
                 query = query.Where(e => e.ExerciseType == exerciseTypeEnum);
             }
-            if (Enum.TryParse<MuscleGroup>(queryParams.MuscleGroup, ignoreCase: true, out var muscleGroupEnum))
-            {
-                query = query.Where(e => e.MuscleGroupsLinks.Any(mgl => mgl.MuscleGroup == muscleGroupEnum));
-            }
             if (Enum.TryParse<Equipment>(queryParams.Equipment, ignoreCase: true, out var equipmentEnum))
             {
                 query = query.Where(e => e.Equipment == equipmentEnum);
@@ -142,6 +138,16 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
             if (Enum.TryParse<DifficultyLevel>(queryParams.DifficultyLevel, ignoreCase: true, out var difficultyLevelEnum))
             {
                 query = query.Where(e => e.DifficultyLevel == difficultyLevelEnum);
+            }
+            if (queryParams.MuscleGroups.Any())
+            {
+                foreach (var mg in queryParams.MuscleGroups)
+                {
+                    if (Enum.TryParse<MuscleGroup>(mg, ignoreCase: true, out var muscleGroupEnum))
+                    {
+                        query = query.Where(e => e.MuscleGroupsLinks.Any(mgl => mgl.MuscleGroup == muscleGroupEnum));
+                    }
+                }
             }
 
             return query;

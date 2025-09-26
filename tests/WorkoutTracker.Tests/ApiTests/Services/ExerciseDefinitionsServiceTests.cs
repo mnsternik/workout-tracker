@@ -66,16 +66,16 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         public async Task GetExercisesAsync_FiltersByDifficultyLevel_ReturnsOnlyMatching()
         {
             // Arrange
-            var filteredValue = DifficultyLevel.Advanced;
+            var expectedDifficultyLevel = DifficultyLevel.Advanced;
             var queryParams = new ExerciseDefinitionQueryParameters 
             { 
                 PageNumber = 1,
                 PageSize = 10,
-                DifficultyLevel = filteredValue.ToString() 
+                DifficultyLevel = expectedDifficultyLevel.ToString() 
             };
 
             // Seeding database with 1 object with target value and one with other value
-            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(filteredValue).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(expectedDifficultyLevel).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(DifficultyLevel.Intermediate).BuildDomain());
             _context.SaveChanges();
 
@@ -84,23 +84,23 @@ namespace WorkoutTracker.Tests.ApiTests.Services
 
             // Assert
             exercises.Should().HaveCount(1);
-            exercises.Select(e => e.DifficultyLevel).Should().OnlyContain(dl => dl == filteredValue);
+            exercises.Select(e => e.DifficultyLevel).Should().OnlyContain(dl => dl == expectedDifficultyLevel);
         }
 
         [Fact]
         public async Task GetExercisesAsync_FiltersByExerciseType_ReturnsOnlyMatching()
         {
             // Arrange
-            var filteredValue = ExerciseType.Cardio;
+            var expectedExerciseType = ExerciseType.Cardio;
             var queryParams = new ExerciseDefinitionQueryParameters
             {
                 PageNumber = 1,
                 PageSize = 10,
-                ExerciseType = filteredValue.ToString()
+                ExerciseType = expectedExerciseType.ToString()
             };
 
             // Seeding database with 1 object with target value and one with other value
-            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithExerciseType(filteredValue).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithExerciseType(expectedExerciseType).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithExerciseType(ExerciseType.Strength).BuildDomain());
             _context.SaveChanges();
 
@@ -109,23 +109,23 @@ namespace WorkoutTracker.Tests.ApiTests.Services
 
             // Assert
             exercises.Should().HaveCount(1);
-            exercises.Select(e => e.ExerciseType).Should().OnlyContain(et => et == filteredValue);
+            exercises.Select(e => e.ExerciseType).Should().OnlyContain(et => et == expectedExerciseType);
         }
 
         [Fact]
         public async Task GetExercisesAsync_FiltersByName_ReturnsOnlyMatching()
         {
             // Arrange
-            var filteredValue = "Filtered";
+            var nameFilter = "somename";
             var queryParams = new ExerciseDefinitionQueryParameters
             {
                 PageNumber = 1,
                 PageSize = 10,
-                Name = filteredValue
+                Name = nameFilter
             };
 
             // Seeding database with 1 object with target value and one with other value
-            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName(filteredValue).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName(nameFilter).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName("Other name").BuildDomain());
             _context.SaveChanges();
 
@@ -134,23 +134,23 @@ namespace WorkoutTracker.Tests.ApiTests.Services
 
             // Assert
             exercises.Should().HaveCount(1);
-            exercises.Select(e => e.Name).Should().OnlyContain(n => n.Contains(filteredValue));
+            exercises.Select(e => e.Name).Should().OnlyContain(n => n.Contains(nameFilter));
         }
 
         [Fact]
         public async Task GetExercisesAsync_FiltersByEquipment_ReturnsOnlyMatching()
         {
             // Arrange
-            var filteredValue = Equipment.PullUpBar;
+            var expectedEquipment = Equipment.PullUpBar;
             var queryParams = new ExerciseDefinitionQueryParameters
             {
                 PageNumber = 1,
                 PageSize = 10,
-                Equipment = filteredValue.ToString()
+                Equipment = expectedEquipment.ToString()
             };
 
             // Seeding database with 1 object with target value and one with other value
-            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithEquipment(filteredValue).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithEquipment(expectedEquipment).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithEquipment(Equipment.Bench).BuildDomain());
             _context.SaveChanges();
 
@@ -159,25 +159,23 @@ namespace WorkoutTracker.Tests.ApiTests.Services
 
             // Assert
             exercises.Should().HaveCount(1);
-            exercises.Select(e => e.Equipment).Should().OnlyContain(e => e == filteredValue);
+            exercises.Select(e => e.Equipment).Should().OnlyContain(e => e == expectedEquipment);
         }
 
         [Fact]
         public async Task GetExercisesAsync_FiltersByMuscleGroup_ReturnsOnlyMatching()
         {
             // Arrange
-            MuscleGroup[] filteredValue = { MuscleGroup.Arms };
-
+            MuscleGroup[] expectedMuscleGroups = { MuscleGroup.Triceps, MuscleGroup.Chest };
             var queryParams = new ExerciseDefinitionQueryParameters
             {
                 PageNumber = 1,
                 PageSize = 10,
-                MuscleGroup = filteredValue.ToString()
-                // TODO: Change ExerciseDefinitionQueryParameters so it accepts array of strings, not just one string
+                MuscleGroups = expectedMuscleGroups.Select(mg => mg.ToString()).ToArray()
             };
 
             // Seeding database with 1 object with target value and one with other value
-            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithMuscleGroups(filteredValue).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithMuscleGroups(expectedMuscleGroups).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithMuscleGroups(MuscleGroup.Abs).BuildDomain());
             _context.SaveChanges();
 
@@ -185,8 +183,32 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             var exercises = await _service.GetExercisesAsync(queryParams);
 
             // Assert
-            exercises.Should().HaveCount(1);
-            //exercises.Select(e => e.Equipment).Should().OnlyContain(e => e == filteredValue);
+            var exercise = exercises.Should().ContainSingle().Subject;
+            exercise.MuscleGroups.Select(mg => mg.MuscleGroup).Should().Contain(expectedMuscleGroups);
+        }
+
+        [Fact]
+        public async Task GetExercisesAsync_FiltersByMuscleGroup_ShouldReturnEmptyList_WhenNotFullMatch()
+        {
+            // Arrange
+            MuscleGroup[] selectedMuscleGroups = { MuscleGroup.Triceps, MuscleGroup.Chest };
+            var queryParams = new ExerciseDefinitionQueryParameters
+            {
+                PageNumber = 1,
+                PageSize = 10,
+                MuscleGroups = selectedMuscleGroups.Select(smg => smg.ToString()).ToArray()
+            };
+
+            // Seeding database with a partial matching object and not-at-all matching object 
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithMuscleGroups(MuscleGroup.Triceps).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithMuscleGroups(MuscleGroup.Abs).BuildDomain());
+            _context.SaveChanges();
+
+            // Act
+            var exercises = await _service.GetExercisesAsync(queryParams);
+
+            // Assert
+            exercises.Should().BeEmpty();
         }
 
         [Fact]
