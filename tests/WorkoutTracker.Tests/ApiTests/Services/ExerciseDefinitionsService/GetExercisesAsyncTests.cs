@@ -3,7 +3,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Api.Data;
 using WorkoutTracker.Api.DTOs.ExerciseDefinition;
-using WorkoutTracker.Api.Exceptions;
 using WorkoutTracker.Api.Mapping;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Services.ExerciseDefinitions;
@@ -12,13 +11,13 @@ using WorkoutTracker.Tests.Builders;
 
 namespace WorkoutTracker.Tests.ApiTests.Services
 {
-    public class ExerciseDefinitionsServiceTests
+    public class GetExercisesAsyncTests
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper; 
+        private readonly IMapper _mapper;
         private readonly IExerciseDefinitionsService _service;
-            
-        public ExerciseDefinitionsServiceTests() 
+
+        public GetExercisesAsyncTests()
         {
             // In-memory database configuration
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -46,11 +45,9 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         public async Task GetExercisesAsync_ReturnsPaginatedList()
         {
             // Arrange
-
             var pageNumber = 2;
             var pageSize = 10;
             var queryParams = new ExerciseDefinitionQueryParameters { PageNumber = pageNumber, PageSize = pageSize };
-
             SeedDatabaseWithDefaults();
 
             // Act
@@ -67,14 +64,14 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         {
             // Arrange
             var expectedDifficultyLevel = DifficultyLevel.Advanced;
-            var queryParams = new ExerciseDefinitionQueryParameters 
-            { 
+            var queryParams = new ExerciseDefinitionQueryParameters
+            {
                 PageNumber = 1,
                 PageSize = 10,
-                DifficultyLevel = expectedDifficultyLevel.ToString() 
+                DifficultyLevel = expectedDifficultyLevel.ToString()
             };
 
-            // Seeding database with 1 object with target value and one with other value
+            // Seeding database with 1 object with target value and another with other value
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(expectedDifficultyLevel).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(DifficultyLevel.Intermediate).BuildDomain());
             _context.SaveChanges();
@@ -99,7 +96,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
                 ExerciseType = expectedExerciseType.ToString()
             };
 
-            // Seeding database with 1 object with target value and one with other value
+            // Seeding database with 1 object with target value and another with other value
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithExerciseType(expectedExerciseType).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithExerciseType(ExerciseType.Strength).BuildDomain());
             _context.SaveChanges();
@@ -124,7 +121,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
                 Name = nameFilter
             };
 
-            // Seeding database with 1 object with target value and one with other value
+            // Seeding database with 1 object with target value and another with other value
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName(nameFilter).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName("Other name").BuildDomain());
             _context.SaveChanges();
@@ -149,7 +146,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
                 Equipment = expectedEquipment.ToString()
             };
 
-            // Seeding database with 1 object with target value and one with other value
+            // Seeding database with 1 object with target value and another with other value
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithEquipment(expectedEquipment).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithEquipment(Equipment.Bench).BuildDomain());
             _context.SaveChanges();
@@ -174,7 +171,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
                 MuscleGroups = expectedMuscleGroups.Select(mg => mg.ToString()).ToArray()
             };
 
-            // Seeding database with 1 object with target value and one with other value
+            // Seeding database with 1 object with target value and another with other value
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithMuscleGroups(expectedMuscleGroups).BuildDomain());
             _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithMuscleGroups(MuscleGroup.Abs).BuildDomain());
             _context.SaveChanges();
@@ -188,7 +185,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         }
 
         [Fact]
-        public async Task GetExercisesAsync_FiltersByMuscleGroup_ShouldReturnEmptyList_WhenNotFullMatch()
+        public async Task GetExercisesAsync_FiltersByMuscleGroup_ShouldReturnEmptyList_WhenNoFullMatch()
         {
             // Arrange
             MuscleGroup[] selectedMuscleGroups = { MuscleGroup.Triceps, MuscleGroup.Chest };
@@ -212,34 +209,104 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         }
 
         [Fact]
-        public async Task GetExerciseAsync_ReturnsExerciseDto()
+        public async Task GetExercisesAsync_SortsByName_Ascending()
         {
             // Arrange
-            int id = 10;
-            SeedDatabaseWithDefaults();
+            var queryParams = new ExerciseDefinitionQueryParameters
+            {
+                PageNumber = 1,
+                PageSize = 10,
+                SortOrder = "asc",
+                SortBy = "name"
+            };
 
-            // Act 
-            var exercise = await _service.GetExerciseAsync(id);
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName("Push up").BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName("Bench press").BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName("Dead bug").BuildDomain());
+            _context.SaveChanges();
+
+            // Act
+            var exercises = await _service.GetExercisesAsync(queryParams);
 
             // Assert
-            exercise.Should().BeOfType<ExerciseDefinitionReadDto>();
-            exercise.Id.Should().Be(id);
+            exercises.Should().HaveCountGreaterThan(1);
+            exercises.Should().BeInAscendingOrder(e => e.Name);
         }
 
         [Fact]
-        public async Task GetExerciseAsync_ThrowsError_WhenEntityNotFound()
+        public async Task GetExercisesAsync_SortsByName_Descending()
         {
             // Arrange
-            int notExistingId = 999;
-            string errorMessage = "Exercise with this ID doesn't exist";
-            SeedDatabaseWithDefaults();
+            var queryParams = new ExerciseDefinitionQueryParameters
+            {
+                PageNumber = 1,
+                PageSize = 10,
+                SortOrder = "desc",
+                SortBy = "name"
+            };
 
-            // Act 
-            Func<Task> act = async () => await _service.GetExerciseAsync(notExistingId);
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName("Push up").BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName("Bench press").BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithName("Dead bug").BuildDomain());
+            _context.SaveChanges();
+
+            // Act
+            var exercises = await _service.GetExercisesAsync(queryParams);
 
             // Assert
-            await act.Should().ThrowAsync<EntityNotFoundException>()
-                .WithMessage(errorMessage);
+            exercises.Should().HaveCountGreaterThan(1);
+            exercises.Should().BeInDescendingOrder(e => e.DifficultyLevel);
+        }
+
+        [Fact]
+        public async Task GetExercisesAsync_SortsByDifficultyLevel_Ascending()
+        {
+            // Arrange
+            var queryParams = new ExerciseDefinitionQueryParameters
+            {
+                PageNumber = 1,
+                PageSize = 10,
+                SortOrder = "asc",
+                SortBy = "difficulty"
+            };
+
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(DifficultyLevel.Intermediate).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(DifficultyLevel.Beginner).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(DifficultyLevel.Advanced).BuildDomain());
+            _context.SaveChanges();
+
+            // Act
+            var exercises = await _service.GetExercisesAsync(queryParams);
+
+            // Assert
+
+            exercises.Should().HaveCount(3);
+            exercises.Should().BeInAscendingOrder(e => e.DifficultyLevel);
+        }
+
+        [Fact]
+        public async Task GetExercisesAsync_SortsByDifficultyLevel_Descending()
+        {
+            // Arrange
+            var queryParams = new ExerciseDefinitionQueryParameters
+            {
+                PageNumber = 1,
+                PageSize = 10,
+                SortOrder = "desc",
+                SortBy = "difficulty"
+            };
+
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(DifficultyLevel.Intermediate).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(DifficultyLevel.Beginner).BuildDomain());
+            _context.ExerciseDefinitions.Add(new ExerciseDefinitionBuilder().WithDifficultyLevel(DifficultyLevel.Advanced).BuildDomain());
+            _context.SaveChanges();
+
+            // Act
+            var exercises = await _service.GetExercisesAsync(queryParams);
+
+            // Assert
+            exercises.Should().HaveCount(3);
+            exercises.Should().BeInDescendingOrder(e => e.Name);
         }
     }
 }
