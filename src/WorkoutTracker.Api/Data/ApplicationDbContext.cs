@@ -42,7 +42,7 @@ namespace WorkoutTracker.Api.Data
 
             modelBuilder.Entity<PerformedExercise>(entity =>
             {
-                entity.Property(e => e.OrderInSession)i
+                entity.Property(e => e.OrderInSession)
                     .IsRequired();
 
                 entity.HasOne(e => e.ExerciseDefinition)
