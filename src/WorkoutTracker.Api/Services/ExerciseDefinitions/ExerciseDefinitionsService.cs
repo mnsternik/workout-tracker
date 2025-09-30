@@ -81,13 +81,6 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
 
             _mapper.Map(exerciseDto, exercise);
 
-            exercise.MuscleGroupsLinks.Clear();
-
-            foreach (var muscleGroup in exerciseDto.MuscleGroups)
-            {
-                exercise.MuscleGroupsLinks.Add(_mapper.Map<ExerciseMuscleGroupLink>(muscleGroup));
-            }
-
             try
             {
                 await _context.SaveChangesAsync();
