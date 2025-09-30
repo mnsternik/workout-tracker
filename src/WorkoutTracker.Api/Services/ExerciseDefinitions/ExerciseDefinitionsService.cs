@@ -161,13 +161,19 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
                 switch (queryParams.SortBy)
                 {
                     case "name":
-                        query = isDescending ? query.OrderByDescending(t => t.Name) : query.OrderBy(t => t.Name);
+                        query = isDescending 
+                            ? query.OrderByDescending(e => e.Name).ThenByDescending(e => e.Id)
+                            : query.OrderBy(e => e.Name).ThenBy(e => e.Id);
                         break;
                     case "difficulty":
-                        query = isDescending ? query.OrderByDescending(t => t.DifficultyLevel) : query.OrderBy(t => t.DifficultyLevel);
+                        query = isDescending 
+                            ? query.OrderByDescending(e => e.DifficultyLevel).ThenByDescending(e => e.Id)
+                            : query.OrderBy(e => e.DifficultyLevel).ThenBy(e => e.Id);
                         break;
                     default:
-                        query = isDescending ? query.OrderByDescending(t => t.Name) : query.OrderBy(t => t.Name);
+                        query = isDescending
+                            ? query.OrderByDescending(e => e.Id)
+                            : query.OrderBy(e => e.Id);
                         break;
                 }
             }
