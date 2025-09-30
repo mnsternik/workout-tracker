@@ -17,26 +17,24 @@ namespace WorkoutTracker.Api.Mapping
                     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email)) // Email is used as UserName for Identity
                     .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.DisplayName));
 
-            // Predefined Exercises
+            // Exercise Definitions 
             CreateMap<ExerciseDefinitionCreateDto, ExerciseDefinition>()
-                .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.Ignore()); // MuscleGroupsLinks are handled separately after mapping
+                .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.MapFrom(src =>
+                    src.MuscleGroups.Select(mg => new ExerciseMuscleGroupLink { MuscleGroup = mg })));
 
             CreateMap<ExerciseDefinitionUpdateDto, ExerciseDefinition>()
-                .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.Ignore());
+                .ForMember(dest => dest.MuscleGroupsLinks, opt => opt.MapFrom(src =>
+                    src.MuscleGroups.Select(mg => new ExerciseMuscleGroupLink { MuscleGroup = mg })));
 
             CreateMap<ExerciseDefinition, ExerciseDefinitionReadDto>()
-                .ForMember(dest => dest.MuscleGroups,
-                    opt => opt.MapFrom(src => src.MuscleGroupsLinks));
+                .ForMember(dest => dest.MuscleGroups, opt => opt.MapFrom(src => 
+                    src.MuscleGroupsLinks.Select(link => link.MuscleGroup)));
 
-            // ExerciseMuscleGroupLink
-            CreateMap<ExerciseMuscleGroupLink, ExerciseDefinitionMuscleGroupLinkDto>();
-            CreateMap<ExerciseDefinitionMuscleGroupLinkDto, ExerciseMuscleGroupLink>();
-
-            // Training session's Sets
+            // Performed Sets
             CreateMap<PerformedSetCreateDto, PerformedSet>(); 
             CreateMap<PerformedSet, PerformedSetReadDto>(); 
 
-            // Training sessions's Exercises
+            // Performed Exercises
             CreateMap<PerformedExerciseCreateDto, PerformedExercise>()
                 .ForMember(dest => dest.Sets, opt => opt.MapFrom(src => src.Sets));
 
