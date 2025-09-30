@@ -9,7 +9,7 @@ namespace WorkoutTracker.Api.DTOs.ExerciseDefinition
         public string Description { get; init; } = string.Empty;
         public string? ImageUrl { get; init; }
         public ExerciseType ExerciseType { get; init; }
-        public IList<ExerciseDefinitionMuscleGroupLinkDto> MuscleGroups { get; init; } = new List<ExerciseDefinitionMuscleGroupLinkDto>();
+        public IList<MuscleGroup> MuscleGroups { get; init; } = new List<MuscleGroup>();
         public Equipment Equipment { get; init; }
         public DifficultyLevel DifficultyLevel { get; init; }
     }
