@@ -14,50 +14,50 @@
 
     public enum ExerciseType
     {
-        Strength,
-        Cardio,
-        Isometric
+        Strength = 1,
+        Cardio = 2,
+        Isometric = 3
     }
 
     public enum MuscleGroup
     {
-        FullBody,
-        Chest,
-        Back,
-        Shoulders,
-        Arms,
-        Biceps,
-        Triceps,
-        Legs,
-        Quads,
-        Hamstrings,
-        Glutes,
-        Calves,
-        Core,
-        Abs,
-        LowerBack,
-        Neck
+        FullBody = 1,
+        Chest = 2,
+        Back = 3,
+        Shoulders = 4,
+        Arms = 5,
+        Biceps = 6,
+        Triceps = 7,
+        Legs = 8,
+        Quads = 9,
+        Hamstrings = 10,
+        Glutes = 11,
+        Calves = 12,
+        Core = 13,
+        Abs = 14,
+        LowerBack = 15,
+        Neck = 16
     }
 
     public enum Equipment
     {
-        None,
-        Barbell,
-        Dumbbell,
-        Kettlebell,
-        ResistanceBand,
-        PullUpBar,
-        DipBars,
-        Bench,
-        Machine,
-        Cable,
-        MedicineBall,
-        TRX,
-        JumpRope,
-        Treadmill,
-        RowingMachine,
-        Bike,
-        Other
+        None = 1,
+        Barbell = 2,
+        Dumbbell = 3,
+        Kettlebell = 4,
+        ResistanceBand = 5,
+        PullUpBar = 6,
+        DipBars = 7,
+        Bench = 8,
+        Machine = 9,
+        Cable = 10,
+        MedicineBall = 11,
+        TRX = 12,
+        JumpRope = 13,
+        Treadmill = 14,
+        RowingMachine = 15,
+        Bike = 16,
+        Other = 17
     }
 
     public enum DifficultyLevel
