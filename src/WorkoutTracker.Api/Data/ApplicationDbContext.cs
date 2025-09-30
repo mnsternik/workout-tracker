@@ -34,9 +34,6 @@ namespace WorkoutTracker.Api.Data
                 entity.Property(e => e.UserId)
                     .IsRequired();
 
-                entity.Property(e => e.DifficultyRating)
-                    .HasConversion<string>();
-
                 entity.HasMany(e => e.PerformedExercises)
                     .WithOne(e => e.TrainingSession)
                     .HasForeignKey(e => e.TrainingSessionId)
@@ -45,7 +42,7 @@ namespace WorkoutTracker.Api.Data
 
             modelBuilder.Entity<PerformedExercise>(entity =>
             {
-                entity.Property(e => e.OrderInSession)
+                entity.Property(e => e.OrderInSession)i
                     .IsRequired();
 
                 entity.HasOne(e => e.ExerciseDefinition)
@@ -74,16 +71,6 @@ namespace WorkoutTracker.Api.Data
 
                 entity.Property(e => e.Description)
                     .IsRequired();
-
-                entity.Property(e => e.ExerciseType)
-                      .HasConversion<string>(); 
-
-                entity.Property(e => e.Equipment)
-                      .HasConversion<string>(); 
-
-                entity.Property(e => e.DifficultyLevel)
-                      .HasConversion<string>();
-
             });
 
             modelBuilder.Entity<ExerciseMuscleGroupLink>(entity =>
@@ -94,9 +81,6 @@ namespace WorkoutTracker.Api.Data
                 entity.HasOne(e => e.ExerciseDefinition)
                     .WithMany(e => e.MuscleGroupsLinks)
                     .HasForeignKey(e => e.ExerciseDefinitionId);
-
-                entity.Property(e => e.MuscleGroup)
-                    .HasConversion<string>();
             });
         }
     }
