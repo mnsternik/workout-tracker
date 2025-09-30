@@ -100,9 +100,7 @@ namespace WorkoutTracker.Tests.Builders
                 ExerciseType = _exerciseType,
                 Equipment = _equipment,
                 DifficultyLevel = _difficultyLevel,
-                MuscleGroups = _muscleGroupsLinks
-                    .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
-                    .ToList()
+                MuscleGroups = _muscleGroupsLinks.Select(link => link.MuscleGroup).ToList(),
             };
 
             _globalId++;
@@ -119,9 +117,7 @@ namespace WorkoutTracker.Tests.Builders
                 ExerciseType = _exerciseType,
                 Equipment = _equipment,
                 DifficultyLevel = _difficultyLevel,
-                MuscleGroups = _muscleGroupsLinks
-                  .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
-                  .ToList()
+                MuscleGroups = _muscleGroupsLinks.Select(link => link.MuscleGroup).ToList(),
             };
         }
 
@@ -136,9 +132,7 @@ namespace WorkoutTracker.Tests.Builders
                 ExerciseType = _exerciseType,
                 Equipment = _equipment,
                 DifficultyLevel = _difficultyLevel,
-                MuscleGroups = _muscleGroupsLinks
-                    .Select(mgl => new ExerciseDefinitionMuscleGroupLinkDto { ExerciseDefinitionId = _id, MuscleGroup = mgl.MuscleGroup })
-                    .ToList()
+                MuscleGroups = _muscleGroupsLinks.Select(link => link.MuscleGroup).ToList(),
             };
 
             _globalId++;

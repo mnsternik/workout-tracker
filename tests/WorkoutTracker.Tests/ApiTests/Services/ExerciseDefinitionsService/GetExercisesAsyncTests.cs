@@ -148,7 +148,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
 
             // Assert
             var exercise = exercises.Should().ContainSingle().Subject;
-            exercise.MuscleGroups.Select(mg => mg.MuscleGroup).Should().Contain(expectedMuscleGroups);
+            exercise.MuscleGroups.Should().Contain(expectedMuscleGroups);
         }
 
         [Fact]
