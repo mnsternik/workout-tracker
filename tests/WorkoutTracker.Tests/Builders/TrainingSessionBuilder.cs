@@ -1,4 +1,5 @@
-﻿using WorkoutTracker.Api.Models;
+﻿using WorkoutTracker.Api.DTOs.TrainingSession;
+using WorkoutTracker.Api.Models;
 
 namespace WorkoutTracker.Tests.Builders
 {
@@ -14,11 +15,11 @@ namespace WorkoutTracker.Tests.Builders
         private DifficultyRating? _difficultyRating = DifficultyRating.Easy;
         private int? _durationMinutes = 45;
         private string _userId = new Guid().ToString();
-        private ApplicationUser _user = null!;
+        private ApplicationUser _user = null!; 
         private ICollection<PerformedExercise> _performedExercises = [];
 
         // Declares how many generated PerformedExercises with default values each TrainingSession will have 
-        private int _exercisesCount = 1; 
+        private int _exercisesCount = 3; 
 
         public TrainingSessionBuilder WithId(int id)
         {
@@ -86,12 +87,92 @@ namespace WorkoutTracker.Tests.Builders
                 DifficultyRating = _difficultyRating,
                 DurationMinutes = _durationMinutes,
                 UserId = _userId,
-                User = _user,
-                PerformedExercises = _performedExercises
+                User = _user, 
+                PerformedExercises = _performedExercises,
             };
+            
+
+            // If there was no provided PerformedExercises list, than create one with default values
+            if (!_performedExercises.Any())
+            {
+                training.PerformedExercises = new PerformedExerciseBuilder().BuildManyDomains(_exercisesCount, training);
+            }
+
+            // If there was no provided User (author), then create one with default values  
+            if (_user == null)
+            {
+                training.User = new ApplicationUserBuilder().BuildDomain();
+                training.UserId = training.User.Id;
+            }
 
             _globalId++;
             return training;
+        }
+
+        public TrainingSessionCreateDto BuildCreateDto()
+        {
+            return new TrainingSessionCreateDto
+            {
+                Name = _name,
+                Note = _note,
+                DifficultyRating = _difficultyRating,
+                DurationMinutes = _durationMinutes,
+                Exercises = new PerformedExerciseBuilder().BuildManyCreateDtos(_exercisesCount),
+            };
+        }
+
+        public TrainingSessionUpdateDto BuildUpdateDto()
+        {
+            return new TrainingSessionUpdateDto
+            {
+                Id = _id,
+                Name = _name,
+                Note = _note,
+                DifficultyRating = _difficultyRating,
+                DurationMinutes = _durationMinutes,
+                Exercises = new PerformedExerciseBuilder().BuildManyUpdateDtos(_exercisesCount),
+            };
+        }
+
+        public TrainingSessionReadDto BuildReadDto()
+        {
+            return new TrainingSessionReadDto
+            {
+                Id = _id,
+                Name = _name,
+                Note = _note,
+                DifficultyRating = _difficultyRating,
+                DurationMinutes = _durationMinutes,
+                Exercises = new PerformedExerciseBuilder().BuildManyReadDtos(_exercisesCount),
+            };
+        }
+
+        public List<TrainingSession> BuildManyDomains(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new TrainingSessionBuilder().WithName("Training session " + i).BuildDomain())
+                .ToList();
+        }
+
+        public List<TrainingSessionCreateDto> BuildManyCreateDtos(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new TrainingSessionBuilder().WithName("Training session " + i).BuildCreateDto())
+                .ToList();
+        }
+
+        public List<TrainingSessionUpdateDto> BuildManyUpdateDtos(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new TrainingSessionBuilder().WithName("Training session " + i).BuildUpdateDto())
+                .ToList();
+        }
+
+        public List<TrainingSessionReadDto> BuildManyReadDtos(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new TrainingSessionBuilder().WithName("Training session " + i).BuildReadDto())
+                .ToList();
         }
     }
 }

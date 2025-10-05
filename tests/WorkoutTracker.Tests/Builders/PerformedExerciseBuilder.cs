@@ -16,7 +16,7 @@ namespace WorkoutTracker.Tests.Builders
         private ExerciseDefinition _exerciseDefinition  = null!;
 
         // Declares how many generated PerformedSets with default values each PerformedExercise will have 
-        private int _setsCount = 1; 
+        private int _setsCount = 3; 
 
         public PerformedExerciseBuilder WithId(int id)
         {
@@ -62,18 +62,27 @@ namespace WorkoutTracker.Tests.Builders
             return this;
         }
         
-        public PerformedExercise BuildDomain()
+        public PerformedExercise BuildDomain() 
         {
             var exercise = new PerformedExercise
             {
                 Id = _id,
                 OrderInSession = _orderInSession,
                 TrainingSessionId = _trainingSessionId,
+                TrainingSession = _trainingSession,
                 ExerciseDefinitionId = _exerciseDefinitionId,
-                TrainingSession  = _trainingSession,
-                ExerciseDefinition  = _exerciseDefinition,
-                Sets = new PerformedSetBuilder().BuildManyDomains(_setsCount)
+                ExerciseDefinition = _exerciseDefinition,
             };
+
+            // Creating and assigning new ExerciseDefinition and its ID, if no ExerciseDefinition was passed
+            if (_exerciseDefinition == null)
+            {
+                exercise.ExerciseDefinition = new ExerciseDefinitionBuilder().BuildDomain();
+                exercise.ExerciseDefinitionId = exercise.ExerciseDefinition.Id;
+            }
+
+            // Creating and assiging list of PerformedSets
+            exercise.Sets = new PerformedSetBuilder().BuildManyDomains(_setsCount, exercise);
 
             _globalId++;
             return exercise;
@@ -87,6 +96,20 @@ namespace WorkoutTracker.Tests.Builders
                 ExerciseDefinitionId = _exerciseDefinitionId,
                 Sets = new PerformedSetBuilder().BuildManyCreateDtos(_setsCount)
             };
+        }
+
+        public PerformedExerciseUpdateDto BuildUpdateDto()
+        {
+            var exercise = new PerformedExerciseUpdateDto
+            {
+                Id = _id,
+                OrderInSession = _orderInSession,
+                ExerciseDefinitionId = _exerciseDefinitionId,
+                Sets = new PerformedSetBuilder().BuildManyUpdateDtos(_setsCount)
+            };
+
+            _globalId++;
+            return exercise;
         }
 
         public PerformedExerciseReadDto BuildReadDto()
@@ -103,24 +126,31 @@ namespace WorkoutTracker.Tests.Builders
             return exercise;
         }
 
-        public List<PerformedExercise> BuildManyDomains(int count)
+        public List<PerformedExercise> BuildManyDomains(int count, TrainingSession trainingSession) 
         {
             return Enumerable.Range(1, count)
-                .Select(i => new PerformedExerciseBuilder().WithId(i).WithOrderInSession(i).BuildDomain())
+                .Select(i => new PerformedExerciseBuilder().WithOrderInSession(i).WithTrainingSession(trainingSession).BuildDomain())
                 .ToList();
         }
 
         public List<PerformedExerciseCreateDto> BuildManyCreateDtos(int count)
         {
             return Enumerable.Range(1, count)
-                .Select(i => new PerformedExerciseBuilder().WithId(i).WithOrderInSession(i).BuildCreateDto())
+                .Select(i => new PerformedExerciseBuilder().WithOrderInSession(i).BuildCreateDto())
+                .ToList();
+        }
+
+        public List<PerformedExerciseUpdateDto> BuildManyUpdateDtos(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new PerformedExerciseBuilder().WithOrderInSession(i).BuildUpdateDto())
                 .ToList();
         }
 
         public List<PerformedExerciseReadDto> BuildManyReadDtos(int count)
         {
             return Enumerable.Range(1, count)
-                .Select(i => new PerformedExerciseBuilder().WithId(i).WithOrderInSession(i).BuildReadDto())
+                .Select(i => new PerformedExerciseBuilder().WithOrderInSession(i).BuildReadDto())
                 .ToList();
         }
     }

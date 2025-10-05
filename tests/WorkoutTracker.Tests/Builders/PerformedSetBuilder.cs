@@ -96,6 +96,22 @@ namespace WorkoutTracker.Tests.Builders
             };
         }
 
+        public PerformedSetUpdateDto BuildUpdateDto()
+        {
+            var performedSet = new PerformedSetUpdateDto
+            {
+                Id = _id,
+                OrderInExercise = _orderInExercise,
+                Reps = _reps,
+                WeightKg = _weightKg,
+                DurationSeconds = _durationSeconds,
+                DistanceMeters = _distanceMeters,
+            };
+
+            _globalId++;
+            return performedSet;
+        }
+
         public PerformedSetReadDto BuildReadDto()
         {
             var performedSet = new PerformedSetReadDto
@@ -112,10 +128,10 @@ namespace WorkoutTracker.Tests.Builders
             return performedSet;
         }
 
-        public List<PerformedSet> BuildManyDomains(int count)
+        public List<PerformedSet> BuildManyDomains(int count, PerformedExercise performedExercise)
         {
             return Enumerable.Range(1, count)
-                .Select(i => new PerformedSetBuilder().WithOrderInExercise(i).BuildDomain())
+                .Select(i => new PerformedSetBuilder().WithOrderInExercise(i).WithPerformedExercise(performedExercise).BuildDomain())
                 .ToList();
         }
 
@@ -123,6 +139,13 @@ namespace WorkoutTracker.Tests.Builders
         {
             return Enumerable.Range(1, count)
                 .Select(i => new PerformedSetBuilder().WithOrderInExercise(i).BuildCreateDto())
+                .ToList();
+        }
+
+        public List<PerformedSetUpdateDto> BuildManyUpdateDtos(int count)
+        {
+            return Enumerable.Range(1, count)
+                .Select(i => new PerformedSetBuilder().WithOrderInExercise(i).BuildUpdateDto())
                 .ToList();
         }
 

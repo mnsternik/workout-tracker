@@ -142,21 +142,21 @@ namespace WorkoutTracker.Tests.Builders
         public List<ExerciseDefinition> BuildManyDomains(int count)
         {
             return Enumerable.Range(1, count)
-                .Select(i => new ExerciseDefinitionBuilder().WithId(i).WithName("Exercise " + i).BuildDomain())
+                .Select(i => new ExerciseDefinitionBuilder().WithName("Exercise " + i).BuildDomain())
                 .ToList();
         }
 
         public List<ExerciseDefinitionReadDto> BuildManyReadDtos(int count)
         {
             return Enumerable.Range(1, count)
-                .Select(i => new ExerciseDefinitionBuilder().WithId(i).WithName("Exercise " + i).BuildReadDto())
+                .Select(i => new ExerciseDefinitionBuilder().WithName("Exercise " + i).BuildReadDto())
                 .ToList();
         }
 
         public List<ExerciseDefinitionCreateDto> BuildManyCreateDtos(int count)
         {
             return Enumerable.Range(1, count)
-                .Select(i => new ExerciseDefinitionBuilder().WithId(i).WithName("Exercise " + i).BuildCreateDto())
+                .Select(i => new ExerciseDefinitionBuilder().WithName("Exercise " + i).BuildCreateDto())
                 .ToList();
         }
     }
