@@ -21,6 +21,6 @@ namespace WorkoutTracker.Api.DTOs.TrainingSession
         public int? DurationMinutes { get; init; }
 
         [Required]
-        public IList<PerformedExerciseCreateDto> Exercises { get; init; } = new List<PerformedExerciseCreateDto>();
+        public IList<PerformedExerciseCreateDto> Exercises { get; init; } = [];
     }
 }

@@ -4,8 +4,10 @@ using WorkoutTracker.Api.Models;
 
 namespace WorkoutTracker.Api.DTOs.TrainingSession
 {
-    public class TrainingSessionUpdateDto
+    public record TrainingSessionUpdateDto
     {
+        public int Id { get; init; }
+
         [Required]
         [MinLength(1, ErrorMessage = "Training session's name cannot be empty")]
         [MaxLength(100, ErrorMessage = "Training session's name must be shorter than 100 characters")]
@@ -21,6 +23,6 @@ namespace WorkoutTracker.Api.DTOs.TrainingSession
         public int? DurationMinutes { get; init; }
 
         [Required]
-        public IList<PerformedExerciseCreateDto> Exercises { get; init; } = new List<PerformedExerciseCreateDto>();
+        public IList<PerformedExerciseUpdateDto> Exercises { get; init; } = [];
     }
 }

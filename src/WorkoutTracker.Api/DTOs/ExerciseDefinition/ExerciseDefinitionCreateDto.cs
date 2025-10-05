@@ -20,7 +20,7 @@ namespace WorkoutTracker.Api.DTOs.ExerciseDefinition
         public ExerciseType ExerciseType { get; init; }
 
         [MinLength(1)]
-        public IList<MuscleGroup> MuscleGroups { get; init; } = new List<MuscleGroup>();
+        public IList<MuscleGroup> MuscleGroups { get; init; } = [];
 
         [Required]
         public Equipment Equipment { get; init; }

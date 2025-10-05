@@ -7,6 +7,6 @@ namespace WorkoutTracker.Api.DTOs.PerformedExercise
         public int Id { get; init; }
         public int OrderInSession { get; init; }
         public int ExerciseDefinitionId { get; init; }
-        public IList<PerformedSetReadDto> Sets { get; init; } = new List<PerformedSetReadDto>();
+        public IList<PerformedSetReadDto> Sets { get; init; } = [];
     }
 }

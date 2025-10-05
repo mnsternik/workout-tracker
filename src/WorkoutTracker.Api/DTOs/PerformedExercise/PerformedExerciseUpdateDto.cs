@@ -3,8 +3,10 @@ using WorkoutTracker.Api.DTOs.PerformedSet;
 
 namespace WorkoutTracker.Api.DTOs.PerformedExercise
 {
-    public record PerformedExerciseCreateDto
+    public record PerformedExerciseUpdateDto
     {
+        public int Id { get; init; }
+
         [Range(0, int.MaxValue)]
         public int OrderInSession { get; init; }
 
@@ -12,6 +14,6 @@ namespace WorkoutTracker.Api.DTOs.PerformedExercise
         public int ExerciseDefinitionId { get; init; }
 
         [Required]
-        public IList<PerformedSetCreateDto> Sets { get; init; } = [];
+        public IList<PerformedSetUpdateDto> Sets { get; init; } = [];
     }
 }
