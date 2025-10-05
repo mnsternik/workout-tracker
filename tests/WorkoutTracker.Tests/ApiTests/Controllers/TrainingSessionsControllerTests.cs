@@ -22,7 +22,7 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
         }
 
         [Fact]
-        public async Task GetTrainingSessions_ShouldReturnOk_WithPaginatedList()
+        public async Task GetTrainingSessions_ReturnsOk_WithPaginatedList()
         {
             // Arrange
             int pageNumber = 2;

@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using WorkoutTracker.Api.DTOs.ExerciseDefinition;
 using WorkoutTracker.Api.Exceptions;
+using WorkoutTracker.Tests.Builders;
 
 namespace WorkoutTracker.Tests.ApiTests.Services
 {
@@ -10,8 +11,10 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         public async Task GetExerciseAsync_ReturnsExerciseDto()
         {
             // Arrange
-            int id = 10;
-            SeedDatabaseWithDefaults();
+            var id = 10;
+            var exerciseToRetrive = new ExerciseDefinitionBuilder().WithId(id).BuildDomain();
+            Context.ExerciseDefinitions.Add(exerciseToRetrive);
+            Context.SaveChanges();
 
             // Act 
             var exercise = await Service.GetExerciseAsync(id);
@@ -25,9 +28,8 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         public async Task GetExerciseAsync_ThrowsError_WhenEntityNotFound()
         {
             // Arrange
-            int notExistingId = 999;
+            int notExistingId = 9999;
             string errorMessage = "Exercise with this ID doesn't exist";
-            SeedDatabaseWithDefaults();
 
             // Act 
             Func<Task> act = async () => await Service.GetExerciseAsync(notExistingId);
