@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using WorkoutTracker.Api.Exceptions;
+using WorkoutTracker.Api.Models;
 using WorkoutTracker.Tests.Builders;
 
 namespace WorkoutTracker.Tests.ApiTests.Services
@@ -32,33 +33,33 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         public async Task UpdateExerciseAsync_ThrowsError_WhenIdNotMatches()
         {
             // Arrange
-            var exerciseId = 1;
-            var exerciseDto = new ExerciseDefinitionBuilder().WithId(exerciseId).BuildUpdateDto();
-            var errorMessage = "ID of an exercise doesn't match with passed ID";
+            int id = 1;
+            int differentId = 99;
+            var exerciseDto = new ExerciseDefinitionBuilder().WithId(differentId).BuildUpdateDto();
+            string expectedErrorMessage = $"ID of an exercise '{exerciseDto.Id}' doesn't match passed ID '{id}'";
 
             // Act
-            exerciseDto.Id = 5;
-            Func<Task> act = async () => await Service.UpdateExerciseAsync(exerciseId, exerciseDto);
+            Func<Task> act = async () => await Service.UpdateExerciseAsync(id, exerciseDto);
 
             // Assert
             await act.Should().ThrowAsync<EntityNotFoundException>()
-                .WithMessage(errorMessage);
+                .WithMessage(expectedErrorMessage);
         }
 
         [Fact]
         public async Task UpdateExerciseAsync_ThrowsError_WhenExerciseNotFound()
         {
             // Arrange
-            var notExistingId = 127; 
+            int notExistingId = 127;
+            string expectedErrorMessage = $"Entity '{nameof(ExerciseDefinition)}' with ID '{notExistingId}' not found.";
             var exerciseDto = new ExerciseDefinitionBuilder().WithId(notExistingId).BuildUpdateDto();
-            var errorMessage = "Exercise with this ID doesn't exist";
 
             // Act
             Func<Task> act = async () => await Service.UpdateExerciseAsync(notExistingId, exerciseDto);
 
             // Assert
             await act.Should().ThrowAsync<EntityNotFoundException>()
-                .WithMessage(errorMessage);
+                .WithMessage(expectedErrorMessage);
         }
     }
 }

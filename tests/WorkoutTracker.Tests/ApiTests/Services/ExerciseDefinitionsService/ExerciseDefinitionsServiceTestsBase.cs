@@ -29,7 +29,6 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context = new ApplicationDbContext(options);
             Context.Database.EnsureCreated();
 
-
             // AutoMapper configuration 
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
             Mapper = config.CreateMapper();

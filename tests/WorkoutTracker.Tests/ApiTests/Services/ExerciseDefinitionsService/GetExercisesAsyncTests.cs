@@ -12,8 +12,8 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         public async Task GetExercisesAsync_ReturnsPaginatedList()
         {
             // Arrange
-            var pageNumber = 2;
-            var pageSize = 10;
+            int pageNumber = 2;
+            int pageSize = 10;
             var queryParams = new ExerciseDefinitionQueryParameters { PageNumber = pageNumber, PageSize = pageSize };
             SeedDatabaseWithDefaults();
 
@@ -80,7 +80,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         public async Task GetExercisesAsync_FiltersByName_ReturnsOnlyMatching()
         {
             // Arrange
-            var nameFilter = "somename";
+            string nameFilter = "somename";
             var queryParams = new ExerciseDefinitionQueryParameters
             {
                 PageNumber = 1,

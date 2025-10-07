@@ -4,6 +4,7 @@ using Moq;
 using WorkoutTracker.Api.Controllers;
 using WorkoutTracker.Api.DTOs.ExerciseDefinition;
 using WorkoutTracker.Api.Exceptions;
+using WorkoutTracker.Api.Models;
 using WorkoutTracker.Api.Services.ExerciseDefinitions;
 using WorkoutTracker.Api.Utilities;
 using WorkoutTracker.Tests.Builders;
@@ -62,7 +63,7 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
         }
 
         [Fact]
-        public async Task GetExercise_ReturnsOk_WithExercise()
+        public async Task GetExercise_ReturnsOk_WithExerciseReadDto()
         {
             // Arrange
             int exerciseId = 1;
@@ -71,7 +72,6 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
             _edServiceMock
                 .Setup(s => s.GetExerciseAsync(exerciseId))
                 .ReturnsAsync(exerciseDto);
-
 
             // Act
             var actionResult = await _edController.GetExercise(exerciseId);
@@ -88,18 +88,18 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
         {
             // Arrange
             int notExistingId = 123;
-            string errorMessage = "Exercise with this ID doesn't exist";
+            string expectedErrorMessage = $"Entity '{nameof(ExerciseDefinition)}' with ID '{notExistingId}' not found.";
 
             _edServiceMock
                 .Setup(s => s.GetExerciseAsync(notExistingId))
-                .ThrowsAsync(new EntityNotFoundException(errorMessage));
+                .ThrowsAsync(new EntityNotFoundException(nameof(ExerciseDefinition), notExistingId));
 
             // Act
             Func<Task> act = async () => await _edController.GetExercise(notExistingId);
 
             // Assert
             await act.Should().ThrowAsync<EntityNotFoundException>()
-                .WithMessage(errorMessage);
+                .WithMessage(expectedErrorMessage);
 
             _edServiceMock.Verify(s => s.GetExerciseAsync(notExistingId), Times.Once());
         }
@@ -130,7 +130,7 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
         public async Task PutExercise_ReturnsNoContent()
         {
             // Arrange
-            var updatedExerciseId = 1; 
+            int updatedExerciseId = 1; 
             var exerciseUpdateDto = new ExerciseDefinitionBuilder().WithId(updatedExerciseId).BuildUpdateDto();
 
             _edServiceMock
@@ -149,20 +149,20 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
         public async Task PutExercise_ThrowsError_WhenIdNotFound()
         {
             // Arrange
-            var notExistingId = 1; 
+            int notExistingId = 1; 
             var exerciseUpdateDto = new ExerciseDefinitionBuilder().WithId(notExistingId).BuildUpdateDto();
-            string errorMessage = "Exercise with this ID doesn't exist";
+            string expectedErrorMessage = $"Entity '{nameof(ExerciseDefinition)}' with ID '{notExistingId}' not found.";
 
             _edServiceMock
                 .Setup(s => s.UpdateExerciseAsync(notExistingId, exerciseUpdateDto))
-                .ThrowsAsync(new EntityNotFoundException(errorMessage));
+                .ThrowsAsync(new EntityNotFoundException(nameof(ExerciseDefinition), notExistingId));
 
             // Act
             Func<Task> act = async () => await _edController.PutExercise(notExistingId, exerciseUpdateDto);
 
             // Assert
             await act.Should().ThrowAsync<EntityNotFoundException>()
-                .WithMessage(errorMessage);
+                .WithMessage(expectedErrorMessage);
 
             _edServiceMock.Verify(s => s.UpdateExerciseAsync(notExistingId, exerciseUpdateDto), Times.Once());
         }
@@ -190,20 +190,20 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
         {
             // Arrange
             int notExistingId = 1;
+            string expectedErrorMessage = $"Entity '{nameof(ExerciseDefinition)}' with ID '{notExistingId}' not found.";
 
             _edServiceMock
                 .Setup(s => s.DeleteExerciseAsync(notExistingId))
-                .ThrowsAsync(new EntityAlreadyExistsException("Exercise with this ID doesn't exist"));
+                .ThrowsAsync(new EntityNotFoundException(nameof(ExerciseDefinition), notExistingId));
 
             // Act
             Func<Task> act = async () => await _edController.DeleteExercise(notExistingId);
 
             // Assert
-            await act.Should().ThrowAsync<EntityAlreadyExistsException>()
-                .WithMessage("Exercise with this ID doesn't exist");
+            await act.Should().ThrowAsync<EntityNotFoundException>()
+                .WithMessage(expectedErrorMessage);
 
             _edServiceMock.Verify(s => s.DeleteExerciseAsync(notExistingId), Times.Once());
         }
-
     }
 }
