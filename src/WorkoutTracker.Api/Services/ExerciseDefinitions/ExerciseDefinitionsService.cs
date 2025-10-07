@@ -47,7 +47,7 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
 
             if (exercise == null)
             {
-                throw new EntityNotFoundException("Exercise with this ID doesn't exist");
+                throw new EntityNotFoundException(nameof(ExerciseDefinition), id);
             }
 
             return _mapper.Map<ExerciseDefinitionReadDto>(exercise);
@@ -67,7 +67,7 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
         {
             if (id != exerciseDto.Id)
             {
-                throw new EntityNotFoundException("ID of an exercise doesn't match with passed ID"); 
+                throw new EntityNotFoundException($"ID of an exercise '{exerciseDto.Id}' doesn't match passed ID '{id}'"); 
             }    
 
             var exercise = await _context.ExerciseDefinitions
@@ -76,7 +76,7 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
 
             if (exercise == null)
             {
-                throw new EntityNotFoundException("Exercise with this ID doesn't exist");
+                throw new EntityNotFoundException(nameof(ExerciseDefinition), id);
             }
 
             _mapper.Map(exerciseDto, exercise);
@@ -89,11 +89,11 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
             {
                 if (!ExerciseExists(id))
                 {
-                    throw new EntityNotFoundException("This exercise was deleted");
+                    throw new EntityNotFoundException($"Exercise with ID {id} was deleted");
                 }
                 else
                 {
-                    throw;
+                    throw new DbUpdateConcurrencyException($"The exercise definition with ID {id} was updated by another process. Please reload and try again.");
                 }
             }
         }
@@ -103,7 +103,7 @@ namespace WorkoutTracker.Api.Services.ExerciseDefinitions
             var exercise = await _context.ExerciseDefinitions.FindAsync(id);
             if (exercise == null)
             {
-                throw new EntityNotFoundException("Exercise with this ID doesn't exist");
+                throw new EntityNotFoundException(nameof(ExerciseDefinition), id);
             }
 
             _context.ExerciseDefinitions.Remove(exercise);

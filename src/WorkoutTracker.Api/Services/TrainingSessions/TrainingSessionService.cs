@@ -56,7 +56,7 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
 
             if (trainingSession == null)
             {
-                throw new EntityNotFoundException($"Training session with Id {id} not found");
+                throw new EntityNotFoundException(nameof(TrainingSession), id);
             }
 
             return _mapper.Map<TrainingSessionReadDto>(trainingSession);
@@ -76,11 +76,11 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
 
             if (sessionToUpdate == null)
             {
-                throw new EntityNotFoundException($"Training session with Id {id} not found");
+                throw new EntityNotFoundException(nameof(TrainingSession), id);
             }
             if (currentUserId != sessionToUpdate.UserId)
             {
-                throw new UnauthorizedActionException("You are not authorized to update another user training session.");
+                throw new UnauthorizedActionException("User not authorized to update another user's training session.");
             }
 
             // Update basic properties
@@ -111,11 +111,11 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             {
                 if (!TrainingSessionExists(id))
                 {
-                    throw new EntityNotFoundException($"Training session with Id {id} was deleted");
+                    throw new EntityNotFoundException($"Training session with ID {id} was deleted");
                 }
                 else
                 {
-                    throw new DbUpdateConcurrencyException($"The training session with Id {id} was updated by another process. Please reload and try again.");
+                    throw new DbUpdateConcurrencyException($"The training session with ID {id} was updated by another process. Please reload and try again.");
                 }
             }
         }
@@ -148,11 +148,11 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
 
             if (trainingSession == null)
             {
-                throw new EntityNotFoundException($"Training session with Id {sessionId} not found");
+                throw new EntityNotFoundException(nameof(TrainingSession), sessionId);
             }
             if (trainingSession.UserId != currentUserId)
             {
-                throw new UnauthorizedActionException("You are not authorized to delete this training session.");
+                throw new UnauthorizedActionException("User not authorized to delete this training session.");
             }
 
             _context.TrainingSessions.Remove(trainingSession);
