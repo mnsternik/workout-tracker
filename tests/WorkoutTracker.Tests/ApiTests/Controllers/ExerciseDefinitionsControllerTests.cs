@@ -38,7 +38,7 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
                 .Take(queryParams.PageSize)
                 .ToList();
 
-            var serviceResponseData = new PaginatedList<ExerciseDefinitionReadDto>
+            var paginatedList = new PaginatedList<ExerciseDefinitionReadDto>
             (
                 itemsForPage,
                 totalItems,
@@ -48,7 +48,7 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
 
             _edServiceMock
                 .Setup(s => s.GetExercisesAsync(queryParams))
-                .Returns(Task.FromResult(serviceResponseData));
+                .Returns(Task.FromResult(paginatedList));
 
             // Act
             var actionResult = await _edController.GetExercises(queryParams);
@@ -60,6 +60,7 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
             returnedData.PageIndex.Should().Be(pageNumber);
             returnedData.TotalPages.Should().Be((totalItems + pageSize - 1) / pageSize);
             returnedData.Count.Should().Be(pageSize);
+            returnedData.Should().BeEquivalentTo(paginatedList);
         }
 
         [Fact]
@@ -78,9 +79,7 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
 
             // Assert
             var okResult = actionResult.Result.Should().BeOfType<OkObjectResult>().Subject;
-            var returnedData = okResult.Value.Should().BeOfType<ExerciseDefinitionReadDto>().Subject;
-
-            returnedData.Id.Should().Be(exerciseId); 
+            okResult.Value.Should().BeEquivalentTo(exerciseDto);
         }
 
         [Fact]
@@ -168,7 +167,7 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
         }
 
         [Fact]
-        public async Task DeleteExercise_ReturnsNoContent_WhenSuccess()
+        public async Task DeleteExercise_ReturnsNoContent()
         {
             // Arrange
             int id = 1;
