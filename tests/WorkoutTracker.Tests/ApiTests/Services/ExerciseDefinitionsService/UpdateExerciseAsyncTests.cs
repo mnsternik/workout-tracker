@@ -21,7 +21,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
 
             // Act
             var updatedExerciseDto = new ExerciseDefinitionBuilder().WithId(exerciseId).WithName(updatedName).BuildUpdateDto();
-            await Service.UpdateExerciseAsync(exerciseId, updatedExerciseDto);
+            await EdService.UpdateExerciseAsync(exerciseId, updatedExerciseDto);
 
             // Assert
             var fetchedExericse = Context.ExerciseDefinitions.Find(exerciseId);
@@ -39,7 +39,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             string expectedErrorMessage = $"ID of an exercise '{exerciseDto.Id}' doesn't match passed ID '{id}'";
 
             // Act
-            Func<Task> act = async () => await Service.UpdateExerciseAsync(id, exerciseDto);
+            Func<Task> act = async () => await EdService.UpdateExerciseAsync(id, exerciseDto);
 
             // Assert
             await act.Should().ThrowAsync<EntityNotFoundException>()
@@ -55,7 +55,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             var exerciseDto = new ExerciseDefinitionBuilder().WithId(notExistingId).BuildUpdateDto();
 
             // Act
-            Func<Task> act = async () => await Service.UpdateExerciseAsync(notExistingId, exerciseDto);
+            Func<Task> act = async () => await EdService.UpdateExerciseAsync(notExistingId, exerciseDto);
 
             // Assert
             await act.Should().ThrowAsync<EntityNotFoundException>()

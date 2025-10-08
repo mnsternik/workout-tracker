@@ -18,7 +18,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act 
-            var exercise = await Service.GetExerciseAsync(id);
+            var exercise = await EdService.GetExerciseAsync(id);
 
             // Assert
             exercise.Should().BeOfType<ExerciseDefinitionReadDto>();
@@ -33,7 +33,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             string expectedErrorMessage = $"Entity '{nameof(ExerciseDefinition)}' with ID '{notExistingId}' not found.";
 
             // Act 
-            Func<Task> act = async () => await Service.GetExerciseAsync(notExistingId);
+            Func<Task> act = async () => await EdService.GetExerciseAsync(notExistingId);
 
             // Assert
             await act.Should().ThrowAsync<EntityNotFoundException>()

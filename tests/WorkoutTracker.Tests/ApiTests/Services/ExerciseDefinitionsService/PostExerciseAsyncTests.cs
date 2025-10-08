@@ -13,7 +13,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             var exerciseDto = new ExerciseDefinitionBuilder().BuildCreateDto();
 
             // Act
-            var result = await Service.PostExerciseAsync(exerciseDto);
+            var result = await EdService.PostExerciseAsync(exerciseDto);
 
             // Assert
             result.Should().BeOfType<ExerciseDefinitionReadDto>();

@@ -18,7 +18,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             SeedDatabaseWithDefaults();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().BeOfType<PaginatedList<ExerciseDefinitionReadDto>>();
@@ -44,7 +44,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().HaveCount(1);
@@ -69,7 +69,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().HaveCount(1);
@@ -94,7 +94,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().HaveCount(1);
@@ -119,7 +119,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().HaveCount(1);
@@ -144,7 +144,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             var exercise = exercises.Should().ContainSingle().Subject;
@@ -169,7 +169,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().BeEmpty();
@@ -193,7 +193,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().HaveCountGreaterThan(1);
@@ -218,7 +218,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().HaveCountGreaterThan(1);
@@ -243,7 +243,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
 
@@ -269,7 +269,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var exercises = await Service.GetExercisesAsync(queryParams);
+            var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().HaveCount(3);

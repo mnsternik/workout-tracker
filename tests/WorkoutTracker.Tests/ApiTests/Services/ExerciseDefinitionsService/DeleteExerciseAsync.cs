@@ -15,7 +15,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             string expectedErrorMessage = $"Entity '{nameof(ExerciseDefinition)}' with ID '{notExistingId}' not found.";
 
             // Act
-            Func<Task> act = async () => await Service.DeleteExerciseAsync(notExistingId);
+            Func<Task> act = async () => await EdService.DeleteExerciseAsync(notExistingId);
 
             // Assert
             await act.Should().ThrowAsync<EntityNotFoundException>()
@@ -33,7 +33,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            await Service.DeleteExerciseAsync(exerciseId);
+            await EdService.DeleteExerciseAsync(exerciseId);
 
             // Assert
             var deletedExercise = Context.ExerciseDefinitions.Find(exerciseId);

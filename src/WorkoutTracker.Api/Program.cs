@@ -103,7 +103,7 @@ namespace WorkoutTracker.Api
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITokenService, JwtTokenService>();
-            builder.Services.AddScoped<ITrainingSessionsService, TrainingSessionService>();
+            builder.Services.AddScoped<ITrainingSessionsService, TrainingSessionsService>();
             builder.Services.AddScoped<IExerciseDefinitionsService, ExerciseDefinitionsService>();
 
             var app = builder.Build();

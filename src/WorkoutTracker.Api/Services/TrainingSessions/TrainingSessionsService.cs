@@ -9,12 +9,12 @@ using WorkoutTracker.Api.Utilities;
 
 namespace WorkoutTracker.Api.Services.TrainingSessions
 {
-    public class TrainingSessionService : ITrainingSessionsService
+    public class TrainingSessionsService : ITrainingSessionsService
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public TrainingSessionService(ApplicationDbContext context, IMapper mapper) 
+        public TrainingSessionsService(ApplicationDbContext context, IMapper mapper) 
         {
             _context = context;
             _mapper = mapper;

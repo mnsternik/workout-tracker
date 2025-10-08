@@ -3,20 +3,20 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using WorkoutTracker.Api.Data;
 using WorkoutTracker.Api.Mapping;
-using WorkoutTracker.Api.Services.ExerciseDefinitions;
+using WorkoutTracker.Api.Services.TrainingSessions;
 using WorkoutTracker.Tests.Builders;
 
 namespace WorkoutTracker.Tests.ApiTests.Services
 {
-    public abstract class ExerciseDefinitionsServiceTestsBase
+    public class TrainingSessionsServiceTestsBase
     {
         private readonly SqliteConnection _connection;
 
         protected readonly ApplicationDbContext Context;
         protected readonly IMapper Mapper;
-        protected readonly ExerciseDefinitionsService EdService; 
+        protected readonly TrainingSessionsService TsService;
 
-        protected ExerciseDefinitionsServiceTestsBase()
+        protected TrainingSessionsServiceTestsBase()
         {
             // SQLite in-memory setup
             _connection = new SqliteConnection("Filename=:memory:");
@@ -33,15 +33,15 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
             Mapper = config.CreateMapper();
 
-            EdService = new ExerciseDefinitionsService(Context, Mapper);
+            TsService = new TrainingSessionsService(Context, Mapper);
         }
 
         protected void SeedDatabaseWithDefaults()
         {
-            Context.ExerciseDefinitions.RemoveRange(Context.ExerciseDefinitions);
+            Context.TrainingSessions.RemoveRange(Context.TrainingSessions);
             Context.SaveChanges();
 
-            Context.ExerciseDefinitions.AddRange(new ExerciseDefinitionBuilder().BuildManyDomains(25));
+            Context.TrainingSessions.AddRange(new TrainingSessionBuilder().BuildManyDomains(25));
             Context.SaveChanges();
         }
     }
