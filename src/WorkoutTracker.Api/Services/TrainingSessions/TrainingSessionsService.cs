@@ -164,35 +164,38 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
         {
             if (!string.IsNullOrEmpty(queryParams.UserId))
             {
-                query = query.Where(t => t.UserId == queryParams.UserId);
+                query = query.Where(ts => ts.UserId == queryParams.UserId);
             }
             if (!string.IsNullOrEmpty(queryParams.DisplayName))
             {
-                query = query.Where(t => t.User.DisplayName.ToLower().Contains(queryParams.DisplayName.ToLower()));
+                query = query.Where(ts => ts.User.DisplayName.ToLower().Contains(queryParams.DisplayName.ToLower()));
             }
-            if (Enum.TryParse<DifficultyRating>(queryParams.Difficulty, ignoreCase: true, out var difficulty))
+            if (Enum.TryParse<DifficultyRating>(queryParams.DifficultyRating, ignoreCase: true, out var difficulty))
             {
-                query = query.Where(t => t.DifficultyRating == difficulty);
+                query = query.Where(ts => ts.DifficultyRating == difficulty);
             }
             if (queryParams.MinDurationMinutes.HasValue)
             {
-                query = query.Where(t => t.DurationMinutes >= queryParams.MinDurationMinutes.Value);
+                query = query.Where(ts => ts.DurationMinutes >= queryParams.MinDurationMinutes.Value);
             }
             if (queryParams.MaxDurationMinutes.HasValue)
             {
-                query = query.Where(t => t.DurationMinutes <= queryParams.MaxDurationMinutes.Value);
+                query = query.Where(ts => ts.DurationMinutes <= queryParams.MaxDurationMinutes.Value);
             }
             if (queryParams.ExerciseNames != null && queryParams.ExerciseNames.Count > 0)
             {
                 var lowerExerciseNames = queryParams.ExerciseNames.Select(e => e.ToLower()).ToList();
-                query = query.Where(t => t.PerformedExercises.Any(te => lowerExerciseNames.Contains(te.ExerciseDefinition.Name.ToLower())));
+                query = query.Where(ts => ts.PerformedExercises.Any(te => lowerExerciseNames.Contains(te.ExerciseDefinition.Name.ToLower())));
             }
             if (queryParams.MuscleGroups != null && queryParams.MuscleGroups.Count > 0)
             {
                 var lowerMuscleGroups = queryParams.MuscleGroups.Select(mg => mg.ToLower()).ToList();
-                query = query.Where(t => t.PerformedExercises.Any(te =>
-                    te.ExerciseDefinition.MuscleGroupsLinks.Any(mgl =>
-                        lowerMuscleGroups.Contains(mgl.MuscleGroup.ToString().ToLower()))));
+                foreach (var mg in lowerMuscleGroups)
+                {
+                    query = query.Where(ts => ts.PerformedExercises.Any(pe =>
+                        pe.ExerciseDefinition.MuscleGroupsLinks.Any(mgl =>
+                            mgl.MuscleGroup.ToString().ToLower() == mg)));
+                }
             }
 
             return query; 
