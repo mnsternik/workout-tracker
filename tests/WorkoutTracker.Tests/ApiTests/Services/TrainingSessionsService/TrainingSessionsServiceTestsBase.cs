@@ -36,13 +36,11 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             TsService = new TrainingSessionsService(Context, Mapper);
         }
 
-        protected void SeedDatabaseWithDefaults()
+        protected void SeedWithDefaultSessions(int count = 25)
         {
             Context.TrainingSessions.RemoveRange(Context.TrainingSessions);
-            Context.SaveChanges();
-
-            Context.TrainingSessions.AddRange(new TrainingSessionBuilder().BuildManyDomains(25));
-            Context.SaveChanges();
+            Context.TrainingSessions.AddRange(new TrainingSessionBuilder().BuildManyDomains(count));
+            Context.SaveChanges(); 
         }
     }
 }

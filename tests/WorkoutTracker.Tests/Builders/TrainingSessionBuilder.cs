@@ -76,6 +76,12 @@ namespace WorkoutTracker.Tests.Builders
             return this; 
         }
 
+        public TrainingSessionBuilder WithPerformedExercises(List<PerformedExercise> performedExercises )
+        {
+            _performedExercises = performedExercises;
+            return this;
+        }
+
         public TrainingSession BuildDomain()
         {
             var training = new TrainingSession

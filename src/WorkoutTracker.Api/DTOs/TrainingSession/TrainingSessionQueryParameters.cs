@@ -19,7 +19,7 @@
         public string? DisplayName { get; set; } 
         public List<string>? ExerciseNames { get; set; } 
         public List<string>? MuscleGroups { get; set; } 
-        public string? Difficulty { get; set; } // e.g "easy", "hard"
+        public string? DifficultyRating { get; set; } // e.g "easy", "hard"
         public int? MinDurationMinutes { get; set; }
         public int? MaxDurationMinutes { get; set; }
         

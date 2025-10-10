@@ -5,7 +5,7 @@ using WorkoutTracker.Tests.Builders;
 
 namespace WorkoutTracker.Tests.ApiTests.Services
 {
-    public class DeleteExerciseAsync : ExerciseDefinitionsServiceTestsBase
+    public class DeleteExerciseAsyncTests : ExerciseDefinitionsServiceTestsBase
     {
         [Fact]
         public async Task DeleteExerciseAsync_ThrowsError_WhenEntityNotFound()

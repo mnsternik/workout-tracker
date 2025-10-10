@@ -14,15 +14,16 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             // Arrange
             int pageNumber = 2;
             int pageSize = 10;
+            int totalItems = 25;
             var queryParams = new ExerciseDefinitionQueryParameters { PageNumber = pageNumber, PageSize = pageSize };
-            SeedDatabaseWithDefaults();
+            SeedDatabaseWithDefaults(totalItems);
 
             // Act
             var exercises = await EdService.GetExercisesAsync(queryParams);
 
             // Assert
             exercises.Should().BeOfType<PaginatedList<ExerciseDefinitionReadDto>>();
-            exercises.Count.Should().BeGreaterThan(0);
+            exercises.Should().HaveCount(pageSize); 
             exercises.PageIndex.Should().Be(pageNumber);
         }
 

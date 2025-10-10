@@ -36,12 +36,12 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             EdService = new ExerciseDefinitionsService(Context, Mapper);
         }
 
-        protected void SeedDatabaseWithDefaults()
+        protected void SeedDatabaseWithDefaults(int count = 25)
         {
             Context.ExerciseDefinitions.RemoveRange(Context.ExerciseDefinitions);
             Context.SaveChanges();
 
-            Context.ExerciseDefinitions.AddRange(new ExerciseDefinitionBuilder().BuildManyDomains(25));
+            Context.ExerciseDefinitions.AddRange(new ExerciseDefinitionBuilder().BuildManyDomains(count));
             Context.SaveChanges();
         }
     }
