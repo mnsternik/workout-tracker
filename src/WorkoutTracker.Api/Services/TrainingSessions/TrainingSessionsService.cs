@@ -162,13 +162,17 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
 
         private IQueryable<TrainingSession> FilterTrainingSessions(IQueryable<TrainingSession> query, TrainingSessionQueryParameters queryParams)
         {
+            if (!string.IsNullOrEmpty(queryParams.TrainingName))
+            {
+                query = query.Where(ts => ts.Name.ToLower().Contains(queryParams.TrainingName.ToLower()));
+            }
             if (!string.IsNullOrEmpty(queryParams.UserId))
             {
                 query = query.Where(ts => ts.UserId == queryParams.UserId);
             }
-            if (!string.IsNullOrEmpty(queryParams.DisplayName))
+            if (!string.IsNullOrEmpty(queryParams.UserDisplayName))
             {
-                query = query.Where(ts => ts.User.DisplayName.ToLower().Contains(queryParams.DisplayName.ToLower()));
+                query = query.Where(ts => ts.User.DisplayName.ToLower().Contains(queryParams.UserDisplayName.ToLower()));
             }
             if (Enum.TryParse<DifficultyRating>(queryParams.DifficultyRating, ignoreCase: true, out var difficulty))
             {
@@ -185,7 +189,10 @@ namespace WorkoutTracker.Api.Services.TrainingSessions
             if (queryParams.ExerciseNames != null && queryParams.ExerciseNames.Count > 0)
             {
                 var lowerExerciseNames = queryParams.ExerciseNames.Select(e => e.ToLower()).ToList();
-                query = query.Where(ts => ts.PerformedExercises.Any(te => lowerExerciseNames.Contains(te.ExerciseDefinition.Name.ToLower())));
+                foreach (var name in lowerExerciseNames)
+                {
+                    query = query.Where(ts => ts.PerformedExercises.Any(pe => pe.ExerciseDefinition.Name.ToLower().Contains(name)));
+                }
             }
             if (queryParams.MuscleGroups != null && queryParams.MuscleGroups.Count > 0)
             {

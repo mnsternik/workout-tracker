@@ -39,8 +39,6 @@ namespace WorkoutTracker.Tests.ApiTests.Services
         protected void SeedDatabaseWithDefaults(int count = 25)
         {
             Context.ExerciseDefinitions.RemoveRange(Context.ExerciseDefinitions);
-            Context.SaveChanges();
-
             Context.ExerciseDefinitions.AddRange(new ExerciseDefinitionBuilder().BuildManyDomains(count));
             Context.SaveChanges();
         }

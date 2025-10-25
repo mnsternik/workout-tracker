@@ -31,11 +31,15 @@ namespace WorkoutTracker.Api.Mapping
                     src.MuscleGroupsLinks.Select(link => link.MuscleGroup)));
 
             // Performed Sets
-            CreateMap<PerformedSetCreateDto, PerformedSet>(); 
+            CreateMap<PerformedSetCreateDto, PerformedSet>();
+            CreateMap<PerformedSetUpdateDto, PerformedSet>();
             CreateMap<PerformedSet, PerformedSetReadDto>(); 
 
             // Performed Exercises
             CreateMap<PerformedExerciseCreateDto, PerformedExercise>()
+                .ForMember(dest => dest.Sets, opt => opt.MapFrom(src => src.Sets));
+
+            CreateMap<PerformedExerciseUpdateDto, PerformedExercise>()
                 .ForMember(dest => dest.Sets, opt => opt.MapFrom(src => src.Sets));
 
             CreateMap<PerformedExercise, PerformedExerciseReadDto>()

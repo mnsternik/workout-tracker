@@ -15,8 +15,9 @@
         public int PageNumber { get; set; } = 1;
 
         // Training session properties
+        public string? TrainingName { get; set; }
         public string? UserId { get; set; }
-        public string? DisplayName { get; set; } 
+        public string? UserDisplayName { get; set; }
         public List<string>? ExerciseNames { get; set; } 
         public List<string>? MuscleGroups { get; set; } 
         public string? DifficultyRating { get; set; } // e.g "easy", "hard"

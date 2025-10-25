@@ -114,22 +114,24 @@ namespace WorkoutTracker.Tests.ApiTests.Services
                 MuscleGroups = expectedMuscleGroups.Select(emg => emg.ToString()).ToList()
             };
 
-            // Building TrainingSession with PerformedExercise that containts expected MuscleGroups
+            // TrainingSessions IDs for asserting
             int fullMatchId = 1;
-            var fullMatchED = new ExerciseDefinitionBuilder().WithId(fullMatchId).WithMuscleGroups([..expectedMuscleGroups]).BuildDomain();
-            var fullMatchPE = new PerformedExerciseBuilder().WithExerciseDefinition(fullMatchED).WithTrainingSessionId(fullMatchId).BuildDomain();
-            var fullMatchTS = new TrainingSessionBuilder().WithId(fullMatchId).WithPerformedExercises([fullMatchPE]).BuildDomain();
-
-            // Building TrainingSession with PerformedExercise that containts only part of excpected MuscleGroups
             int partialMatchId = 2;
-            var partialMatchED = new ExerciseDefinitionBuilder().WithId(partialMatchId).WithMuscleGroups([MuscleGroup.Legs, MuscleGroup.Chest]).BuildDomain();
-            var partialMatchPE = new PerformedExerciseBuilder().WithExerciseDefinition(partialMatchED).WithTrainingSessionId(partialMatchId).BuildDomain();
-            var partialMatchTS = new TrainingSessionBuilder().WithId(partialMatchId).WithPerformedExercises([partialMatchPE]).BuildDomain();
-
-            // Building TrainingSession with PerformedExercise that does NOT containt expected MuscleGroups
             int noMatchId = 3;
-            var noMatchED = new ExerciseDefinitionBuilder().WithId(noMatchId).WithMuscleGroups(MuscleGroup.Legs, MuscleGroup.Abs).BuildDomain();
+
+            // Defining ExerciseDefinitions
+            var fullMatchED = new ExerciseDefinitionBuilder().WithMuscleGroups([..expectedMuscleGroups]).BuildDomain();
+            var partialMatchED = new ExerciseDefinitionBuilder().WithMuscleGroups([MuscleGroup.Legs, MuscleGroup.Chest]).BuildDomain();
+            var noMatchED = new ExerciseDefinitionBuilder().WithMuscleGroups(MuscleGroup.Legs, MuscleGroup.Abs).BuildDomain();
+
+            // Creating PerformedExercises with ExerciseDefinitions
+            var fullMatchPE = new PerformedExerciseBuilder().WithExerciseDefinition(fullMatchED).WithTrainingSessionId(fullMatchId).BuildDomain();
+            var partialMatchPE = new PerformedExerciseBuilder().WithExerciseDefinition(partialMatchED).WithTrainingSessionId(partialMatchId).BuildDomain();
             var noMatchPE = new PerformedExerciseBuilder().WithExerciseDefinition(noMatchED).WithTrainingSessionId(noMatchId).BuildDomain();
+
+            // Creating TrainingSessions with full match, partial match and no match filter criteria
+            var fullMatchTS = new TrainingSessionBuilder().WithId(fullMatchId).WithPerformedExercises([fullMatchPE]).BuildDomain();
+            var partialMatchTS = new TrainingSessionBuilder().WithId(partialMatchId).WithPerformedExercises([partialMatchPE]).BuildDomain();
             var noMatchTS = new TrainingSessionBuilder().WithId(noMatchId).WithPerformedExercises([noMatchPE]).BuildDomain();
 
             // Seeding database 
@@ -142,10 +144,141 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             Context.SaveChanges();
 
             // Act
-            var trainingSessions = await TsService.GetTrainingSessionsAsync(queryParams);
+            var result = await TsService.GetTrainingSessionsAsync(queryParams);
 
             // Assert
-            trainingSessions.Should().ContainSingle(ts => ts.Id == fullMatchTS.Id);
+            result.Should().HaveCount(1);
+            result.Should().ContainSingle(ts => ts.Id == fullMatchTS.Id);
+        }
+
+        [Fact]
+        public async Task GetTrainingSessionsAsync_FiltersByExerciseNames_ReturnsOnlyFullMatches()
+        {
+            // Arrange
+            string matchingName1 = "Push up";
+            string matchingName2 = "Running";
+
+            List<string> expectedNames = new List<string> { matchingName1, matchingName2 };
+            var queryParams = new TrainingSessionQueryParameters
+            {
+                PageNumber = 1,
+                PageSize = 10,
+                ExerciseNames = expectedNames
+            };
+
+            // TrainingSessions IDs for asserting
+            int fullMatchId = 1;
+            int partialMatchID = 2;
+            int noMatchID = 3;
+
+            // Defining ExerciseDefinitions
+            var pushUp = new ExerciseDefinitionBuilder().WithName(matchingName1).BuildDomain();
+            var running = new ExerciseDefinitionBuilder().WithName(matchingName2).BuildDomain();
+
+            // Creating PerformedExercises with ExerciseDefinitions
+            var performedPushUp = new PerformedExerciseBuilder().WithExerciseDefinition(pushUp).BuildDomain();
+            var performedPushUp2 = new PerformedExerciseBuilder().WithExerciseDefinition(pushUp).BuildDomain();
+            var performedRunning = new PerformedExerciseBuilder().WithExerciseDefinition(running).BuildDomain();
+
+            // Creating TrainingSessions with full match, partial match and no match filter criteria
+            var fullMatchTs = new TrainingSessionBuilder().WithId(fullMatchId).WithPerformedExercises([performedPushUp, performedRunning]).BuildDomain();
+            var partialMatchTs = new TrainingSessionBuilder().WithId(partialMatchID).WithPerformedExercises([performedPushUp2]).BuildDomain();
+            var noMatchTs = new TrainingSessionBuilder().WithId(noMatchID).WithDefaultExercises(3).BuildDomain();
+
+            // Seeding database
+            Context.TrainingSessions.Add(fullMatchTs);
+            Context.TrainingSessions.Add(partialMatchTs);
+            Context.TrainingSessions.Add(noMatchTs);
+            Context.SaveChanges();
+
+            // Act
+            var result = await TsService.GetTrainingSessionsAsync(queryParams);
+
+            // Assert
+            result.Should().HaveCount(1);
+            result.Should().ContainSingle(ts => ts.Id == fullMatchId);
+        }
+
+        [Fact]
+        public async Task GetTrainingSessionsAsync_FiltersByTrainingName_ReturnsOnlyMatching() // TODO: This does not work boeacuse of Contain(string, StringComprarion)
+        {
+            // Arrange
+            string matchingName = "My Training";
+            string notMatchingName = "My Workout";
+            var matchingTs = new TrainingSessionBuilder().WithName(matchingName).BuildDomain();
+            var notMatchingTs = new TrainingSessionBuilder().WithName(notMatchingName).BuildDomain();
+
+            var queryParams = new TrainingSessionQueryParameters {
+                TrainingName = matchingName,
+                PageNumber = 1,
+                PageSize = 10,
+            };
+
+            Context.TrainingSessions.AddRange([matchingTs, notMatchingTs]);
+            Context.SaveChanges();
+
+            // Act
+            var result = await TsService.GetTrainingSessionsAsync(queryParams);
+
+            // Assert
+            result.Should().HaveCount(1);
+            result.Should().ContainSingle(ts => ts.Name == matchingName);
+        }
+
+        [Fact]
+        public async Task GetTrainingSessionsAsync_FiltersByUserId_ReturnsOnlyMatching()
+        {
+            // Arrange
+            var matchingUser = new ApplicationUserBuilder().BuildDomain();
+            var notMatchingUser = new ApplicationUserBuilder().BuildDomain();
+
+            var matchingTs = new TrainingSessionBuilder().WithUser(matchingUser).BuildDomain();
+            var notMatchingTs = new TrainingSessionBuilder().WithUser(notMatchingUser).BuildDomain();
+
+            var queryParams = new TrainingSessionQueryParameters
+            {
+                UserId = matchingUser.Id,
+                PageNumber = 1,
+                PageSize = 10,
+            };
+
+            Context.TrainingSessions.AddRange([matchingTs, notMatchingTs]);
+            Context.SaveChanges();
+
+            // Act
+            var result = await TsService.GetTrainingSessionsAsync(queryParams);
+
+            // Assert
+            result.Should().HaveCount(1);
+            result.Should().ContainSingle(ts => ts.UserId == matchingUser.Id);
+        }
+
+        [Fact]
+        public async Task GetTrainingSessionsAsync_FiltersByUserDisplayedName_ReturnsOnlyMatching()
+        {
+            // Arrange
+            var matchingUser = new ApplicationUserBuilder().WithDisplayName("test1").BuildDomain();
+            var notMatchingUser = new ApplicationUserBuilder().WithDisplayName("test2").BuildDomain();
+
+            var matchingTs = new TrainingSessionBuilder().WithUser(matchingUser).BuildDomain();
+            var notMatchingTs = new TrainingSessionBuilder().WithUser(notMatchingUser).BuildDomain();
+
+            var queryParams = new TrainingSessionQueryParameters
+            {
+                UserDisplayName = matchingUser.DisplayName,
+                PageNumber = 1,
+                PageSize = 10,
+            };
+
+            Context.TrainingSessions.AddRange([matchingTs, notMatchingTs]);
+            Context.SaveChanges();
+
+            // Act
+            var result = await TsService.GetTrainingSessionsAsync(queryParams);
+
+            // Assert
+            result.Should().HaveCount(1);
+            result.Should().ContainSingle(ts => ts.UserId == matchingUser.Id);
         }
     }
 }

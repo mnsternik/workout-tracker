@@ -14,6 +14,7 @@ namespace WorkoutTracker.Tests.Builders
         private int _exerciseDefinitionId = 1;
         private TrainingSession _trainingSession  = null!;
         private ExerciseDefinition _exerciseDefinition  = null!;
+        private List<PerformedSet> _sets = [];
 
         // Declares how many generated PerformedSets with default values each PerformedExercise will have 
         private int _setsCount = 3; 
@@ -56,6 +57,12 @@ namespace WorkoutTracker.Tests.Builders
             return this;
         }
 
+        public PerformedExerciseBuilder WithPerformedSets(List<PerformedSet> sets)
+        {
+            _sets = sets;
+            return this;
+        }
+
         public PerformedExerciseBuilder WithDefaultSets(int count)
         {
             _setsCount = count;
@@ -72,6 +79,7 @@ namespace WorkoutTracker.Tests.Builders
                 TrainingSession = _trainingSession,
                 ExerciseDefinitionId = _exerciseDefinitionId,
                 ExerciseDefinition = _exerciseDefinition,
+                Sets = _sets,
             };
 
             // Creating and assigning new ExerciseDefinition and its ID, if no ExerciseDefinition was passed
@@ -81,8 +89,10 @@ namespace WorkoutTracker.Tests.Builders
                 exercise.ExerciseDefinitionId = exercise.ExerciseDefinition.Id;
             }
 
-            // Creating and assiging list of PerformedSets
-            exercise.Sets = new PerformedSetBuilder().BuildManyDomains(_setsCount, exercise);
+            if (!_sets.Any())
+            {
+                exercise.Sets = new PerformedSetBuilder().BuildManyDomains(_setsCount, exercise);
+            }
 
             _globalId++;
             return exercise;
