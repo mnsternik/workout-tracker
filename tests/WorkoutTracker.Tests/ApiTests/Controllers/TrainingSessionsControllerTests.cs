@@ -86,21 +86,21 @@ namespace WorkoutTracker.Tests.ApiTests.Controllers
         public async Task GetTrainingSession_ReturnsOk_WithTrainingReadDto()
         {
             // Arrange
-            int exerciseId = 1; 
-            var exercise = new TrainingSessionBuilder().WithId(exerciseId).BuildReadDto();
+            int tsId = 1; 
+            var tsReadDto = new TrainingSessionBuilder().WithId(tsId).BuildReadDto();
 
             _tsServiceMock
-                .Setup(s => s.GetTrainingSessionAsync(exerciseId))
-                .ReturnsAsync(exercise);
+                .Setup(s => s.GetTrainingSessionAsync(tsId))
+                .ReturnsAsync(tsReadDto);
 
             // Act
-            var actionResult = await _tsController.GetTrainingSession(exerciseId);
+            var actionResult = await _tsController.GetTrainingSession(tsId);
 
             // Assert
             var okResult = actionResult.Result.Should().BeOfType<OkObjectResult>().Subject;
-            okResult.Value.Should().BeEquivalentTo(exercise);
+            okResult.Value.Should().BeEquivalentTo(tsReadDto);
 
-            _tsServiceMock.Verify(s => s.GetTrainingSessionAsync(exerciseId), Times.Once());
+            _tsServiceMock.Verify(s => s.GetTrainingSessionAsync(tsId), Times.Once());
         }
 
         [Fact]
