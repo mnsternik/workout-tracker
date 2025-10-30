@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using Microsoft.OpenApi.Validations;
 using WorkoutTracker.Api.DTOs.PerformedExercise;
 using WorkoutTracker.Api.DTOs.PerformedSet;
 using WorkoutTracker.Api.DTOs.TrainingSession;
+using WorkoutTracker.Api.Exceptions;
 using WorkoutTracker.Api.Models;
 using WorkoutTracker.Tests.Builders;
 
@@ -93,7 +93,7 @@ namespace WorkoutTracker.Tests.ApiTests.Services
             await TsService.UpdateTrainingSessionAsync(orginalSession.Id, user.Id, updateSessionDto);
 
             // Assert
-            var updatedSession = Context.TrainingSessions.Find(orginalSession.Id); 
+            var updatedSession = Context.TrainingSessions.Find(orginalSession.Id);
             updatedSession.Should().BeOfType<TrainingSession>();
             updatedSession.PerformedExercises.Should().HaveCount(2);
 
@@ -102,6 +102,62 @@ namespace WorkoutTracker.Tests.ApiTests.Services
 
             updatedSession.PerformedExercises.ToList()[0].Sets.ToList()[0].WeightKg.Should().Be(updatedWeight);
             updatedSession.PerformedExercises.ToList()[0].Sets.ToList()[0].Reps.Should().Be(updatedReps);
+        }
+
+        [Fact]
+        public async Task UpdateTrainingSession_ThrowsError_WhenCurrentUserIdIsNull()
+        {
+            // Arrange
+            int sessionId = 1;
+            string errorMessage = "User ID not found in token";
+            var sessionUpdateDto = new TrainingSessionBuilder().BuildUpdateDto();
+
+            // Act
+            Func<Task> act = async () => await TsService.UpdateTrainingSessionAsync(sessionId, null, sessionUpdateDto);
+
+            // Assert
+            await act.Should().ThrowAsync<UnauthorizedActionException>()
+                .WithMessage(errorMessage);
+        }
+
+        [Fact]
+        public async Task UpdateTrainingSession_ThrowsError_WhenSessionNotFound()
+        {
+            // Arrange
+            int notExistingId = 999;
+            string currentUserId = Guid.NewGuid().ToString();
+            string errorMessage = $"Entity '{nameof(TrainingSession)}' with ID '{notExistingId}' not found.";
+            var sessionUpdateDto = new TrainingSessionBuilder().BuildUpdateDto();
+
+            // Act
+            Func<Task> act = async () => await TsService.UpdateTrainingSessionAsync(notExistingId, currentUserId, sessionUpdateDto);
+
+            // Assert
+            await act.Should().ThrowAsync<EntityNotFoundException>()
+                .WithMessage(errorMessage);
+        }
+
+        [Fact]
+        public async Task UpdateTrainingSession_ThrowsError_UserAndSessionIdDoesntMatch()
+        {
+            // Arrange
+            int sessionId = 1;
+            string errorMessage = $"User not authorized to update another user's training session.";
+
+            var currentUser = new ApplicationUserBuilder().BuildDomain();
+            var anotherUser = new ApplicationUserBuilder().BuildDomain();
+            var sessionUpdateDto = new TrainingSessionBuilder().BuildUpdateDto();
+            var orginalSession = new TrainingSessionBuilder().WithId(sessionId).WithUser(anotherUser).BuildDomain();
+
+            Context.TrainingSessions.Add(orginalSession);
+            Context.SaveChanges();
+
+            // Act
+            Func <Task> act = async () => await TsService.UpdateTrainingSessionAsync(sessionId, currentUser.Id, sessionUpdateDto);
+
+            // Assert
+            await act.Should().ThrowAsync<UnauthorizedActionException>()
+                .WithMessage(errorMessage);
         }
     }
 }
