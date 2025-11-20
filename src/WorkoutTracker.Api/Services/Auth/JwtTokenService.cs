@@ -1,23 +1,22 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
-using WorkoutTracker.Api.DTOs.Auth;
 using WorkoutTracker.Api.Models;
 
 namespace WorkoutTracker.Api.Services.Auth
 {
-    public class JwtTokenService : ITokenService
+    public class JwtTokenService : IJwtTokenService
     {
-        private readonly IConfiguration _configuration;
+        private readonly JwtSettings _jwtSettings;
 
-        public JwtTokenService(IConfiguration configuration)
+        public JwtTokenService(IOptions<JwtSettings> jwtSettings)
         {
-            _configuration = configuration;
+            _jwtSettings = jwtSettings.Value;
         }
 
-        public LoginResponseDto GenerateToken(ApplicationUser user)
+        public string GenerateJwtToken(ApplicationUser user)
         {
             var authClaims = new List<Claim>
             {
@@ -26,16 +25,13 @@ namespace WorkoutTracker.Api.Services.Auth
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var jwtSettings = _configuration.GetSection("Jwt");
-            var jwtAuthSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
-            var tokenValidityInMinutes = int.Parse(jwtSettings["DurationInMinutes"] ?? "60");
-
+            var jwtAuthSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(authClaims),
-                Expires = DateTime.UtcNow.AddMinutes(tokenValidityInMinutes),
-                Issuer = jwtSettings["Issuer"],
-                Audience = jwtSettings["Audience"],
+                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
+                Issuer = _jwtSettings.Issuer,
+                Audience = _jwtSettings.Audience,
                 SigningCredentials = new SigningCredentials(jwtAuthSigningKey, SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -43,21 +39,7 @@ namespace WorkoutTracker.Api.Services.Auth
             var token = tokenHanlder.CreateToken(tokenDescriptor);
             var jwtToken = tokenHanlder.WriteToken(token);
 
-            return new LoginResponseDto
-            {
-                Token = jwtToken,
-                Expiration = token.ValidTo
-            };
-        }
-
-        public string GenerateRefreshToken()
-        {
-            var randomNumber = new byte[64];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomNumber);
-                return Convert.ToBase64String(randomNumber);
-            }
+            return jwtToken;
         }
     }
 }

@@ -69,10 +69,12 @@ namespace WorkoutTracker.Api
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             builder.Services.AddAuthorization();
+
             builder.Services.AddControllers(options =>
             {
                 options.Filters.Add<ExceptionFilter>();
             });
+
             builder.Services.AddEndpointsApiExplorer();
 
             builder.Services.AddSwaggerGen(options => {
@@ -102,9 +104,13 @@ namespace WorkoutTracker.Api
             });
 
             builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<ITokenService, JwtTokenService>();
+            builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+            builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             builder.Services.AddScoped<ITrainingSessionsService, TrainingSessionsService>();
             builder.Services.AddScoped<IExerciseDefinitionsService, ExerciseDefinitionsService>();
+
+            builder.Services.AddOptions<JwtSettings>()
+                .BindConfiguration("Jwt");
 
             var app = builder.Build();
 
