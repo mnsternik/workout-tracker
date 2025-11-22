@@ -38,7 +38,6 @@ namespace WorkoutTracker.Api.Services.Auth
                 Email = registerDto.Email,
                 UserName = registerDto.Email,
                 DisplayName = registerDto.DisplayName,
-                SecurityStamp = Guid.NewGuid().ToString(), // Important for invalidating tokens when the password or other security-related data changes
             };
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
@@ -83,9 +82,10 @@ namespace WorkoutTracker.Api.Services.Auth
 
         public async Task<LoginResponseDto> RefreshTokenAsync(RefreshTokenRequestDto tokenDto)
         {
-            var storedRefreshToken = await _refreshTokenService.GetAndValidateTokenAsync(tokenDto.RefreshToken);
+            var storedRefreshToken = await _refreshTokenService.GetUserRefreshTokenAsync(tokenDto.RefreshToken);
+            _refreshTokenService.ValidateToken(storedRefreshToken);
 
-            // Generete new JWT token
+            // Generate new JWT token
             var jwtToken = _tokenService.GenerateJwtToken(storedRefreshToken.User!);
             var jwtTokenExpiration = DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes);
 
